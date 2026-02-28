@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { Chunk } from './index.js';
+
 
 /**
  * Compute composite chunk ID matching OpenClaw's format
