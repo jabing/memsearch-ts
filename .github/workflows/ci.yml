@@ -67,10 +67,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Run tests
-        run: pnpm test --coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        run: pnpm --filter './packages/*' test
 
   build:
     name: Build
