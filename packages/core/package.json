@@ -1,0 +1,48 @@
+{
+  "name": "memsearch-core",
+  "version": "1.0.0",
+  "description": "Semantic memory search core library for TypeScript/Node.js",
+  "license": "MIT",
+  "author": "memsearch team",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE", "API.md"],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@zilliz/milvus2-sdk-node": "^2.5.8",
+    "chokidar": "^4.0.0",
+    "openai": "^4.0.0",
+    "zod": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "@google/generative-ai": "^0.17.0",
+    "ollama": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "publishConfig": { "access": "public" },
+  "keywords": ["semantic-search", "vector-database", "milvus", "markdown", "memory", "rag", "embeddings", "typescript"]
+}

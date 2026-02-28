@@ -1,0 +1,29 @@
+{
+  "hooks": [
+    {
+      "name": "session-start",
+      "type": "command",
+      "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.ts",
+      "timeout": 10000
+    },
+    {
+      "name": "user-prompt-submit",
+      "type": "command",
+      "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit.ts",
+      "timeout": 15000
+    },
+    {
+      "name": "stop",
+      "type": "command",
+      "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/stop.ts",
+      "timeout": 120000,
+      "async": true
+    },
+    {
+      "name": "session-end",
+      "type": "command",
+      "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/session-end.ts",
+      "timeout": 10000
+    }
+  ]
+}

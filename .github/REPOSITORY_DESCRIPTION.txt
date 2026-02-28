@@ -1,0 +1,1 @@
+Semantic memory search for markdown knowledge bases — TypeScript/Node.js port of memsearch built on Milvus vector database. Supports OpenAI, Google, Ollama, Voyage embeddings with Claude Code plugin integration.

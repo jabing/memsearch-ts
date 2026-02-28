@@ -1,0 +1,50 @@
+{
+  "name": "memsearch-ts",
+  "version": "0.0.0-development",
+  "description": "Semantic memory search for markdown knowledge bases, built with TypeScript",
+  "private": true,
+  "license": "MIT",
+  "author": "memsearch team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/memsearch/memsearch-ts.git"
+  },
+  "scripts": {
+    "dev": "pnpm --filter './packages/*' dev",
+    "build": "pnpm --filter './packages/*' build",
+    "test": "pnpm --filter './packages/*' test",
+    "test:coverage": "pnpm --filter './packages/*' test --coverage",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "pnpm --filter './packages/*' clean && rm -rf node_modules",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "semantic-search",
+    "vector-database",
+    "milvus",
+    "markdown",
+    "memory",
+    "rag",
+    "embeddings",
+    "typescript",
+    "claude-code"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.10.0"
+}
