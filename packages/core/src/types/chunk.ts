@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { Chunk } from './index.js';
 
 /**
@@ -19,7 +20,6 @@ export function computeChunkId(
  * Compute SHA-256 hash of text (sync version for Node.js)
  */
 export function sha256Sync(text: string): string {
-  import * as crypto from 'crypto';
   return crypto.createHash('sha256').update(text, 'utf-8').digest('hex');
 }
 

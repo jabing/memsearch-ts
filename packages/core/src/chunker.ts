@@ -17,9 +17,7 @@ export interface ChunkOptions {
  * Split markdown text into chunks
  */
 export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[] {
-  const {
-    source = '',
-  } = options;
+  const { source = '' } = options;
 
   const lines = text.split('\n');
   const chunks: Chunk[] = [];
@@ -27,7 +25,9 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
   // Find all heading positions
   const headingPositions: Array<{ line: number; level: number; title: string }> = [];
   for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(HEADING_RE);
+    const line = lines[i];
+    if (!line) continue;
+    const match = line.match(HEADING_RE);
     if (match && match[1] && match[2]) {
       headingPositions.push({
         line: i,
@@ -39,9 +39,9 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
 
   // Build sections between headings
   const sections: Array<{ start: number; end: number; heading: string; level: number }> = [];
-  
+
   const firstHeadingLine = headingPositions[0]?.line;
-  if (headingPositions.length === 0 || firstHeadingLine !== undefined && firstHeadingLine > 0) {
+  if (headingPositions.length === 0 || (firstHeadingLine !== undefined && firstHeadingLine > 0)) {
     sections.push({
       start: 0,
       end: firstHeadingLine ?? lines.length,
