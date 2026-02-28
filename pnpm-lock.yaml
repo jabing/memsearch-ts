@@ -76,9 +76,6 @@ importers:
         specifier: ^3.0.0
         version: 3.25.76
     optionalDependencies:
-      '@google/generative-ai':
-        specifier: ^0.17.0
-        version: 0.17.2
       ollama:
         specifier: ^0.5.0
         version: 0.5.18
@@ -629,13 +626,6 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
-
-  /@google/generative-ai@0.17.2:
-    resolution: {integrity: sha512-TRKwCCqFe8JawNpvwk5FNcE9CQGUUjROiUxpH+uUR46sjLkgsR2v4+clu2axxnzEd9rnMpUNAJriUXeEu0zFBw==}
-    engines: {node: '>=18.0.0'}
-    requiresBuild: true
-    dev: false
-    optional: true
 
   /@grpc/grpc-js@1.7.3:
     resolution: {integrity: sha512-H9l79u4kJ2PVSxUNA08HMYAnUBLj9v6KjYQ7SQ71hOZcEXhShE/y5iQCesP8+6/Ik/7i2O0a10bPquIcYfufog==}
