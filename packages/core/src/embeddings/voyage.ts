@@ -6,7 +6,7 @@
  */
 
 import type { IEmbeddingProvider, ProviderOptions } from './types.js';
-import { EmbeddingError, EmbeddingErrorCodes } from '../types/errors.js';
+import { EmbeddingError } from '../types/errors.js';
 import { validateApiKey, DEFAULT_BATCH_SIZES, KNOWN_DIMENSIONS } from './types.js';
 import { createLogger } from '../utils/logger.js';
 

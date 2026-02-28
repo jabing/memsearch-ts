@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { MemSearchConfig } from './index.js';
-import { validateConfigWithZod, validateEmbeddingProvider } from './validation.js';
+import { validateConfigWithZod } from './validation.js';
 
 /**
  * Default configuration values

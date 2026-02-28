@@ -1,7 +1,7 @@
 /** Milvus vector storage layer */
 import { MilvusClient, DataType } from '@zilliz/milvus2-sdk-node';
 import type { SearchResult } from './types/index.js';
-import { MilvusError, MilvusErrorCodes } from './types/errors.js';
+import { MilvusError } from './types/errors.js';
 import { createLogger } from './utils/logger.js';
 import { resolvePath } from './types/config.js';
 

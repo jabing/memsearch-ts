@@ -1,0 +1,37 @@
+🚀 Excited to announce the official release of memsearch-ts v1.0.1!
+
+📦 npm packages:
+• memsearch-core → https://www.npmjs.com/package/memsearch-core
+• memsearch-cli  → https://www.npmjs.com/package/memsearch-cli
+• GitHub → https://github.com/jabing/memsearch-ts
+
+🔍 What is it?
+memsearch-ts is a TypeScript/Node.js semantic memory search engine for markdown knowledge bases, built on the Milvus vector database. It's a complete TypeScript migration of the Python memsearch project.
+
+✨ Key Features:
+📝 Markdown-first — memories are .md files, human-readable and git-friendly
+⚡ Smart dedup — SHA-256 content hashing prevents duplicates
+🔄 Live sync — file watcher auto-indexes changes
+🔍 Hybrid search — Dense vector + BM25 sparse + RRF reranking
+🧩 Claude Code plugin — automatic persistent memory for Claude Code
+🎯 Type-safe — full TypeScript strict mode support
+🌐 Multiple embeddings — OpenAI, Google, Ollama, Voyage
+
+💻 Quick Start:
+npm install memsearch-core
+npm install -g memsearch-cli
+
+📊 Project Stats:
+• 42 TypeScript files
+• ~3,000 lines of code
+• 25 unit tests (all passing)
+• 14 documentation files
+
+🙏 Credits: Complete TypeScript migration of Python memsearch (https://github.com/zilliztech/memsearch)
+
+🔗 Links:
+• GitHub: https://github.com/jabing/memsearch-ts
+• npm (core): https://www.npmjs.com/package/memsearch-core
+• npm (cli): https://www.npmjs.com/package/memsearch-cli
+
+#TypeScript #NodeJS #VectorDatabase #Milvus #SemanticSearch #AI #Embeddings #OpenSource #NPM #ClaudeCode #RAG #Markdown #Memory #DeveloperTools

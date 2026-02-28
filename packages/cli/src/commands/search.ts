@@ -2,8 +2,8 @@
  * memsearch search command
  */
 
-import { MemSearch } from 'memsearch-core';
-import { createLogger } from 'memsearch-core/utils';
+import { MemSearch, type SearchResult } from 'memsearch-core';
+import { createLogger } from 'memsearch-core/dist/utils/index.js';
 
 const logger = createLogger('cli:search');
 
@@ -32,7 +32,7 @@ export async function searchCommand(query: string, options: SearchOptions): Prom
     } else {
       console.log(`\n📊 Found ${results.length} results:\n`);
       
-      results.forEach((result, i) => {
+      results.forEach((result: SearchResult, i: number) => {
         console.log(`${i + 1}. [${result.score.toFixed(4)}] ${result.heading || 'Untitled'}`);
         console.log(`   Source: ${result.source}:${result.startLine}-${result.endLine}`);
         console.log(`   ${result.content.substring(0, 200)}${result.content.length > 200 ? '...' : ''}\n`);

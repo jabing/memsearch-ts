@@ -3,7 +3,7 @@
  */
 
 import { MemSearch } from 'memsearch-core';
-import { createLogger } from 'memsearch-core/utils';
+import { createLogger } from 'memsearch-core/dist/utils/index.js';
 import type { MemSearchConfig } from 'memsearch-core';
 
 const logger = createLogger('cli:watch');
@@ -28,7 +28,7 @@ export async function watchCommand(paths: string[], options: WatchOptions): Prom
 
     const watcher = mem.watch({
       debounceMs: parseInt(options.debounce),
-      onEvent: (eventType, summary, filePath) => {
+      onEvent: (eventType: string, summary: string, filePath: string) => {
         const icon = eventType === 'created' ? '📄' : eventType === 'modified' ? '✏️' : '🗑️';
         console.log(`${icon} ${eventType}: ${filePath}`);
       },

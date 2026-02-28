@@ -2,7 +2,7 @@
  * MemSearch - High-level API for semantic memory search
  */
 
-import { validateConfig, resolvePath, DEFAULT_MODELS } from './types/config.js';
+import { validateConfig } from './types/config.js';
 import type { MemSearchConfig, SearchResult, WatcherCallback, Chunk } from './types/index.js';
 import { MemSearchError } from './types/errors.js';
 import { getEmbeddingProvider, type IEmbeddingProvider } from './embeddings/index.js';
