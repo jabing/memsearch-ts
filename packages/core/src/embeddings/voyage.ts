@@ -71,7 +71,7 @@ export class VoyageEmbedding implements IEmbeddingProvider {
       return allEmbeddings;
 
     } catch (error) {
-      const err = error as any;
+      const err = error as Error & { status?: number };
       
       if (err.status === 429) {
         throw new EmbeddingError(
@@ -96,7 +96,6 @@ export class VoyageEmbedding implements IEmbeddingProvider {
       );
     }
   }
-
   /**
    * Make HTTP request to Voyage API
    */
@@ -115,9 +114,8 @@ export class VoyageEmbedding implements IEmbeddingProvider {
       throw new Error(`Voyage API error: ${response.status} ${JSON.stringify(error)}`);
     }
 
-    return response.json();
+    return (await response.json()) as VoyageAPIResponse;
   }
-
   /**
    * Chunk array into smaller batches
    */

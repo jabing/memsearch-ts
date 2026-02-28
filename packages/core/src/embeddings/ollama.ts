@@ -31,22 +31,20 @@ export class OllamaEmbedding implements IEmbeddingProvider {
     this.batchSize = options.batchSize || DEFAULT_BATCH_SIZES.ollama;
     
     // Auto-detect dimension by embedding a test string
-    this.dimension = options.dimension || this.detectDimension();
-    
-    logger.info('OllamaEmbedding initialized', { model: this.modelName, dimension: this.dimension, host });
+    this.dimension = options.dimension ?? 768;
   }
 
   /**
    * Detect dimension from model
    */
-  private detectDimension(): number {
+  private async detectDimension(): Promise<number> {
     try {
-      const response = this.client.embed({
+      const response = await this.client.embed({
         model: this.modelName,
         input: 'test',
       });
-      if (!response || !response.embedding) return 768;
-      return response.embedding.length;
+      if (!response || !response.embeddings) return 768;
+      return response.embeddings[0]?.length ?? 768;
     } catch (error) {
       logger.warn('Failed to detect dimension, using default 768');
       return 768;
@@ -77,14 +75,18 @@ export class OllamaEmbedding implements IEmbeddingProvider {
           throw new EmbeddingError('No embedding returned from Ollama', EmbeddingErrorCodes.API_ERROR);
         }
 
-        allEmbeddings.push(response.embeddings[0]);
+        const embedding = response.embeddings[0];
+        if (!embedding) {
+          throw new EmbeddingError('No embedding returned from Ollama', EmbeddingErrorCodes.API_ERROR);
+        }
+        allEmbeddings.push(embedding);
       }
 
       logger.info('Embedding completed', { total: allEmbeddings.length });
       return allEmbeddings;
 
     } catch (error) {
-      const err = error as any;
+      const err = error as Error & { code?: string; response?: { status?: number } };
       
       if (err.code === 'ECONNREFUSED') {
         throw new EmbeddingError(
@@ -109,7 +111,6 @@ export class OllamaEmbedding implements IEmbeddingProvider {
       );
     }
   }
-
   /**
    * Get model info
    */

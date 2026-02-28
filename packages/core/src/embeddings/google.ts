@@ -5,10 +5,10 @@
  * Environment: GOOGLE_API_KEY
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { IEmbeddingProvider, ProviderOptions } from './types.js';
 import { EmbeddingError, EmbeddingErrorCodes } from '../types/errors.js';
-import { validateApiKey, DEFAULT_BATCH_SIZES, KNOWN_DIMENSIONS } from './types.js';
+import { validateApiKey, DEFAULT_BATCH_SIZES } from './types.js';
 import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('google');
@@ -18,14 +18,14 @@ export class GoogleEmbedding implements IEmbeddingProvider {
   readonly dimension: number;
   readonly providerName = 'google';
   
-  private client: GoogleGenAI;
+  private client: GoogleGenerativeAI;
   private batchSize: number;
 
   constructor(options: ProviderOptions = {}) {
     const apiKey = options.apiKey || process.env.GOOGLE_API_KEY;
     validateApiKey(apiKey, 'Google');
 
-    this.client = new GoogleGenAI({ apiKey });
+    this.client = new GoogleGenerativeAI(apiKey);
     this.modelName = options.model || 'gemini-embedding-001';
     this.batchSize = options.batchSize || DEFAULT_BATCH_SIZES.google;
     
@@ -49,13 +49,10 @@ export class GoogleEmbedding implements IEmbeddingProvider {
       const allEmbeddings: number[][] = [];
 
       // Google API processes one text at a time for embeddings
+      const model = this.client.getGenerativeModel({ model: this.modelName });
       for (const text of texts) {
-        const result = await this.client.models.embedContent({
-          model: this.modelName,
-          contents: text,
-        });
-
-        const embedding = result.embeddings?.[0]?.values;
+        const result = await model.embedContent(text);
+        const embedding = result.embedding?.values;
         if (!embedding) {
           throw new Error('No embedding returned');
         }
@@ -66,10 +63,11 @@ export class GoogleEmbedding implements IEmbeddingProvider {
       }
 
       logger.info('Embedding completed', { total: allEmbeddings.length });
+      logger.info('Embedding completed', { total: allEmbeddings.length });
       return allEmbeddings;
 
     } catch (error) {
-      const err = error as any;
+      const err = error as Error & { status?: number };
       
       if (err.status === 429) {
         throw new EmbeddingError(

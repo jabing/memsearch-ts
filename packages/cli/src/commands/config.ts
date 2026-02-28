@@ -108,13 +108,25 @@ async function setConfig(configPath: string, key: string, value: string): Promis
   // Set nested key (e.g., embedding.provider)
   const keys = key.split('.');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let current: any = config;
+  let current: Record<string, unknown> = config;
   for (let i = 0; i < keys.length - 1; i++) {
-    if (!current[keys[i]]) current[keys[i]] = {};
-    current = current[keys[i]];
+    const k = keys[i];
+    if (!k) continue;
+    if (!current[k]) {
+      current[k] = {};
+    }
+    const nextCurrent = current[k];
+    if (nextCurrent && typeof nextCurrent === 'object') {
+      current = nextCurrent as Record<string, unknown>;
+    } else {
+      current[k] = {};
+      current = current[k] as Record<string, unknown>;
+    }
   }
-  current[keys[keys.length - 1]] = value;
-
+  const lastKey = keys[keys.length - 1];
+  if (lastKey) {
+    current[lastKey] = value;
+  }
   writeFileSync(configPath, JSON.stringify(config, null, 2));
   console.log(`✅ Set ${key} = ${value}`);
 }

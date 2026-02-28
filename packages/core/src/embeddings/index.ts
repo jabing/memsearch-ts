@@ -45,24 +45,29 @@ export async function getEmbeddingProvider(
   let ProviderClass: new (options: ProviderOptions) => IEmbeddingProvider;
   
   switch (providerName) {
-    case 'openai':
+    case 'openai': {
       ProviderClass = (await import('./openai.js')).OpenAIEmbedding;
       break;
-    case 'google':
+    }
+    case 'google': {
       ProviderClass = (await import('./google.js')).GoogleEmbedding;
       break;
-    case 'ollama':
+    }
+    case 'ollama': {
       ProviderClass = (await import('./ollama.js')).OllamaEmbedding;
       break;
-    case 'voyage':
+    }
+    case 'voyage': {
       ProviderClass = (await import('./voyage.js')).VoyageEmbedding;
       break;
-    default:
+    }
+    default: {
       const validProviders = ['openai', 'google', 'ollama', 'voyage'].join(', ');
       throw new EmbeddingError(
         `Unknown embedding provider: ${name}. Valid: ${validProviders}`,
         EmbeddingErrorCodes.MODEL_NOT_FOUND
       );
+    }
   }
 
   // Set default model if not provided

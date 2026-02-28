@@ -2,7 +2,7 @@
  * Embedding provider protocol and types
  */
 
-import { EmbeddingError, EmbeddingErrorCodes } from '../types/errors.js';
+import { EmbeddingError } from '../types/errors.js';
 
 /**
  * Embedding provider interface - all providers must implement this

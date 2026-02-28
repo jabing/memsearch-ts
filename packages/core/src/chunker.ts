@@ -29,7 +29,9 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
   // Find all heading positions
   const headingPositions: Array<{ line: number; level: number; title: string }> = [];
   for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(HEADING_RE);
+    const line = lines[i];
+    if (!line) continue;
+    const match = line.match(HEADING_RE);
     if (match && match[1] && match[2]) {
       headingPositions.push({
         line: i,
@@ -38,7 +40,6 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
       });
     }
   }
-
   // Build sections between headings
   const sections: Array<{ start: number; end: number; heading: string; level: number }> = [];
   

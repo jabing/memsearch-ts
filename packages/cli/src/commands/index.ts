@@ -4,7 +4,7 @@
 
 import { MemSearch } from 'memsearch-core';
 import { createLogger } from 'memsearch-core/utils';
-import type { EmbeddingProvider } from 'memsearch-core';
+import type { ProviderType } from 'memsearch-core';
 
 const logger = createLogger('cli:index');
 
@@ -23,7 +23,7 @@ export async function indexCommand(paths: string[], options: IndexOptions): Prom
     const mem = new MemSearch({
       paths: paths.length > 0 ? paths : undefined,
       embedding: {
-        provider: options.provider as EmbeddingProvider,
+        provider: options.provider as ProviderType,
         model: options.model,
       },
       milvus: {
