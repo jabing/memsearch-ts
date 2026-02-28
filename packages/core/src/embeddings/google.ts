@@ -1,11 +1,11 @@
 /**
  * Google (Gemini) Embedding Provider
  * 
- * Requires: @google/generative-ai npm package
+ * Requires: @google/genai npm package (replaces @google/generative-ai)
  * Environment: GOOGLE_API_KEY
  */
 
-import { GoogleGenAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import type { IEmbeddingProvider, ProviderOptions } from './types.js';
 import { EmbeddingError, EmbeddingErrorCodes } from '../types/errors.js';
 import { validateApiKey, DEFAULT_BATCH_SIZES, KNOWN_DIMENSIONS } from './types.js';
@@ -74,7 +74,7 @@ export class GoogleEmbedding implements IEmbeddingProvider {
       if (err.status === 429) {
         throw new EmbeddingError(
           'Google rate limit exceeded',
-          EmbeddingErrorCodes.RATE_LIMIT,
+          'RATE_LIMIT',
           error
         );
       }
@@ -82,14 +82,14 @@ export class GoogleEmbedding implements IEmbeddingProvider {
       if (err.status === 401 || err.status === 403) {
         throw new EmbeddingError(
           'Google authentication failed. Check your API key.',
-          EmbeddingErrorCodes.API_KEY_MISSING,
+          'API_KEY_MISSING',
           error
         );
       }
 
       throw new EmbeddingError(
         `Google embedding failed: ${err.message}`,
-        EmbeddingErrorCodes.API_ERROR,
+        'API_ERROR',
         error
       );
     }

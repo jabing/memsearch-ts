@@ -38,7 +38,11 @@ async function testOpenAI(): Promise<TestResult> {
     const { OpenAI } = await import('openai');
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await client.embeddings.create({ model: 'text-embedding-3-small', input: ['test'] });
-    return { name: 'OpenAI Embedding', status: 'pass', duration: Date.now() - start, details: `Dimension: ${response.data[0].embedding.length}` };
+    const embedding = response.data[0];
+    if (embedding) {
+      return { name: 'OpenAI Embedding', status: 'pass', duration: Date.now() - start, details: `Dimension: ${embedding.embedding.length}` };
+    }
+    return { name: 'OpenAI Embedding', status: 'fail', duration: Date.now() - start, error: 'No embedding returned' };
   } catch (error) {
     return { name: 'OpenAI Embedding', status: 'fail', duration: Date.now() - start, error: (error as Error).message };
   }
@@ -62,11 +66,16 @@ async function runPOCTests() {
   
   results.forEach(r => {
     const icon = r.status === 'pass' ? '✅' : r.status === 'fail' ? '❌' : '⏭️';
-    console.log(`${icon} ${r.name}: ${r.status.toUpperCase()} - ${r.details || r.error || ''}`);
+    console.log(`${icon} ${r.name} (${r.duration}ms)`);
+    if (r.details) console.log(`   ${r.details}`);
+    if (r.error) console.log(`   Error: ${r.error}`);
   });
-  
+
   const passed = results.filter(r => r.status === 'pass').length;
-  console.log(`\n${passed}/${results.length} tests passed`);
+  const failed = results.filter(r => r.status === 'fail').length;
+  const skipped = results.filter(r => r.status === 'skip').length;
+
+  console.log(`\n=== Summary: ${passed} passed, ${failed} failed, ${skipped} skipped ===`);
 }
 
-runPOCTests().catch(console.error);
+runPOCTests();

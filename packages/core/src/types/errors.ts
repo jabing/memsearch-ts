@@ -21,7 +21,7 @@ export const ConfigErrorCodes = {
 } as const;
 
 export class ConfigError extends MemSearchError {
-  constructor(message: string, code = ConfigErrorCodes.VALIDATION_FAILED, cause?: unknown) {
+  constructor(message: string, code: string = ConfigErrorCodes.VALIDATION_FAILED, cause?: unknown) {
     super(message, code, cause);
     this.name = 'ConfigError';
   }
@@ -38,8 +38,10 @@ export const MilvusErrorCodes = {
   QUERY_FAILED: 'MILVUS_QUERY_FAILED',
 } as const;
 
+export type MilvusErrorCode = typeof MilvusErrorCodes[keyof typeof MilvusErrorCodes];
+
 export class MilvusError extends MemSearchError {
-  constructor(message: string, code = MilvusErrorCodes.CONNECTION_FAILED, cause?: unknown) {
+  constructor(message: string, code: string = MilvusErrorCodes.CONNECTION_FAILED, cause?: unknown) {
     super(message, code, cause);
     this.name = 'MilvusError';
   }
@@ -54,8 +56,10 @@ export const EmbeddingErrorCodes = {
   BATCH_FAILED: 'EMBEDDING_BATCH_FAILED',
 } as const;
 
+export type EmbeddingErrorCode = typeof EmbeddingErrorCodes[keyof typeof EmbeddingErrorCodes];
+
 export class EmbeddingError extends MemSearchError {
-  constructor(message: string, code = EmbeddingErrorCodes.API_ERROR, cause?: unknown) {
+  constructor(message: string, code: string = EmbeddingErrorCodes.API_ERROR, cause?: unknown) {
     super(message, code, cause);
     this.name = 'EmbeddingError';
   }
@@ -70,7 +74,7 @@ export const FileSystemErrorCodes = {
 } as const;
 
 export class FileSystemError extends MemSearchError {
-  constructor(message: string, code = FileSystemErrorCodes.READ_FAILED, cause?: unknown) {
+  constructor(message: string, code: string = FileSystemErrorCodes.READ_FAILED, cause?: unknown) {
     super(message, code, cause);
     this.name = 'FileSystemError';
   }
@@ -83,7 +87,7 @@ export const ChunkingErrorCodes = {
 } as const;
 
 export class ChunkingError extends MemSearchError {
-  constructor(message: string, code = ChunkingErrorCodes.INVALID_MARKDOWN, cause?: unknown) {
+  constructor(message: string, code: string = ChunkingErrorCodes.INVALID_MARKDOWN, cause?: unknown) {
     super(message, code, cause);
     this.name = 'ChunkingError';
   }
@@ -96,8 +100,48 @@ export const WatcherErrorCodes = {
 } as const;
 
 export class WatcherError extends MemSearchError {
-  constructor(message: string, code = WatcherErrorCodes.WATCH_FAILED, cause?: unknown) {
+  constructor(message: string, code: string = WatcherErrorCodes.WATCH_FAILED, cause?: unknown) {
     super(message, code, cause);
     this.name = 'WatcherError';
+  }
+}
+
+/**
+ * Wrap a function with error context
+ * Adds context information to errors for better debugging
+ */
+export function withErrorContext<T>(
+  fn: () => T,
+  context: Record<string, unknown>
+): T {
+  try {
+    return fn();
+  } catch (error) {
+    const err = error as Error;
+    throw new MemSearchError(
+      `${err.message} (context: ${JSON.stringify(context)})`,
+      undefined,
+      error
+    );
+  }
+}
+
+/**
+ * Wrap an async function with error context
+ * Adds context information to errors for better debugging
+ */
+export async function withErrorContextAsync<T>(
+  fn: () => Promise<T>,
+  context: Record<string, unknown>
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    const err = error as Error;
+    throw new MemSearchError(
+      `${err.message} (context: ${JSON.stringify(context)})`,
+      undefined,
+      error
+    );
   }
 }

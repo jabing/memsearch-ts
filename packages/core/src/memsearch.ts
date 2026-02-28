@@ -82,11 +82,9 @@ export class MemSearch {
 
     logger.debug('Indexing file', { path });
 
-    const content = await Bun.readFile(path, 'utf-8').catch(async () => {
-      // Fallback for non-Bun environments
-      const fs = await import('fs/promises');
-      return fs.readFile(path, 'utf-8');
-    });
+    // Read file content using standard Node.js fs/promises
+    const fs = await import('fs/promises');
+    const content = await fs.readFile(path, 'utf-8');
 
     const chunks = chunkMarkdown(content, {
       source: path,
@@ -106,7 +104,7 @@ export class MemSearch {
     );
 
     // Delete stale chunks
-    const stale = [...oldIds].filter(id => !chunkIds.has(id));
+    const stale = Array.from(oldIds).filter(id => !chunkIds.has(id));
     if (stale.length > 0) {
       await this.store.deleteByHashes(stale);
       logger.debug('Deleted stale chunks', { count: stale.length });
@@ -114,8 +112,8 @@ export class MemSearch {
 
     if (!force) {
       // Skip existing chunks
-      const existingIds = [...chunkIds].filter(id => oldIds.has(id));
-      if (existingIds.length === chunkIds.length) {
+      const existingIds = Array.from(chunkIds).filter(id => oldIds.has(id));
+      if (existingIds.length === chunkIds.size) {
         logger.debug('All chunks exist, skipping', { path });
         return 0;
       }
@@ -140,7 +138,7 @@ export class MemSearch {
 
     const records: MilvusRecord[] = chunks.map((chunk, i) => ({
       chunk_hash: computeChunkId(chunk.source, chunk.startLine, chunk.endLine, chunk.contentHash, model),
-      embedding: embeddings[i],
+      embedding: embeddings[i]!,
       content: chunk.content,
       source: chunk.source,
       heading: chunk.heading,
@@ -164,7 +162,11 @@ export class MemSearch {
     logger.debug('Searching', { query, topK });
 
     const embeddings = await embedder.embed([query]);
-    const results = await this.store.search(embeddings[0], query, topK);
+    const embedding = embeddings[0];
+    if (!embedding) {
+      throw new MemSearchError('Failed to generate query embedding');
+    }
+    const results = await this.store.search(embedding, query, topK);
 
     logger.info('Search completed', { results: results.length });
     return results;
@@ -175,7 +177,7 @@ export class MemSearch {
    */
   watch(options?: { onEvent?: WatcherCallback; debounceMs?: number }): FileWatcher {
     logger.info('Starting watcher', { debounceMs: options?.debounceMs });
-    return new FileWatcher(this.config.paths, async (eventType, filePath) => {
+    return new FileWatcher(this.config.paths, async (eventType: string, filePath: string) => {
       if (eventType === 'deleted') {
         await this.store.deleteBySource(filePath);
       } else {
@@ -232,9 +234,9 @@ class FileWatcher {
       });
 
       this.watcher
-        .on('add', (path) => this.handleChange('created', path))
-        .on('change', (path) => this.handleChange('modified', path))
-        .on('unlink', (path) => this.handleChange('deleted', path));
+        .on('add', (path: string) => this.handleChange('created', path))
+        .on('change', (path: string) => this.handleChange('modified', path))
+        .on('unlink', (path: string) => this.handleChange('deleted', path));
 
       console.log('[memsearch:watcher] Started');
     } catch (error) {

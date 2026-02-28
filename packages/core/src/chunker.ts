@@ -30,7 +30,7 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
   const headingPositions: Array<{ line: number; level: number; title: string }> = [];
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].match(HEADING_RE);
-    if (match) {
+    if (match && match[1] && match[2]) {
       headingPositions.push({
         line: i,
         level: match[1].length,
@@ -42,10 +42,11 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
   // Build sections between headings
   const sections: Array<{ start: number; end: number; heading: string; level: number }> = [];
   
-  if (headingPositions.length === 0 || headingPositions[0].line > 0) {
+  const firstHeadingLine = headingPositions[0]?.line;
+  if (headingPositions.length === 0 || firstHeadingLine !== undefined && firstHeadingLine > 0) {
     sections.push({
       start: 0,
-      end: headingPositions[0]?.line ?? lines.length,
+      end: firstHeadingLine ?? lines.length,
       heading: '',
       level: 0,
     });
@@ -53,10 +54,11 @@ export function chunkMarkdown(text: string, options: ChunkOptions = {}): Chunk[]
 
   for (let idx = 0; idx < headingPositions.length; idx++) {
     const pos = headingPositions[idx];
-    const nextStart = headingPositions[idx + 1]?.line ?? lines.length;
+    if (!pos) continue;
+    const nextHeadingLine = headingPositions[idx + 1]?.line;
     sections.push({
       start: pos.line,
-      end: nextStart,
+      end: nextHeadingLine ?? lines.length,
       heading: pos.title,
       level: pos.level,
     });

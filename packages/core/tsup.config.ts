@@ -6,5 +6,5 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  external: ['@zilliz/milvus2-sdk-node', 'openai', '@google/generative-ai', 'ollama', 'chokidar', 'zod'],
+  external: ['@zilliz/milvus2-sdk-node', 'openai', '@google/genai', 'ollama', 'chokidar', 'zod'],
 });

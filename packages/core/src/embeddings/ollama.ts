@@ -6,7 +6,7 @@
  * No API key needed - runs locally
  */
 
-import Ollama from 'ollama';
+import * as ollamaNS from 'ollama';
 import type { IEmbeddingProvider, ProviderOptions } from './types.js';
 import { EmbeddingError, EmbeddingErrorCodes } from '../types/errors.js';
 import { DEFAULT_BATCH_SIZES } from './types.js';
@@ -19,13 +19,14 @@ export class OllamaEmbedding implements IEmbeddingProvider {
   readonly dimension: number;
   readonly providerName = 'ollama';
   
-  private client: Ollama;
+  private client: ollamaNS.Ollama;
   private batchSize: number;
 
   constructor(options: ProviderOptions = {}) {
     const host = process.env.OLLAMA_HOST || 'http://localhost:11434';
     
-    this.client = new Ollama({ host });
+    // Use ollama as namespace and Ollama as constructor
+    this.client = new ollamaNS.Ollama({ host });
     this.modelName = options.model || 'nomic-embed-text';
     this.batchSize = options.batchSize || DEFAULT_BATCH_SIZES.ollama;
     
@@ -44,6 +45,7 @@ export class OllamaEmbedding implements IEmbeddingProvider {
         model: this.modelName,
         input: 'test',
       });
+      if (!response || !response.embedding) return 768;
       return response.embedding.length;
     } catch (error) {
       logger.warn('Failed to detect dimension, using default 768');
@@ -70,8 +72,12 @@ export class OllamaEmbedding implements IEmbeddingProvider {
           model: this.modelName,
           input: text,
         });
+        
+        if (!response || !response.embeddings || response.embeddings.length === 0) {
+          throw new EmbeddingError('No embedding returned from Ollama', EmbeddingErrorCodes.API_ERROR);
+        }
 
-        allEmbeddings.push(response.embedding);
+        allEmbeddings.push(response.embeddings[0]);
       }
 
       logger.info('Embedding completed', { total: allEmbeddings.length });
@@ -82,7 +88,7 @@ export class OllamaEmbedding implements IEmbeddingProvider {
       
       if (err.code === 'ECONNREFUSED') {
         throw new EmbeddingError(
-          'Cannot connect to Ollama. Make sure Ollama is running on ' + process.env.OLLAMA_HOST || 'http://localhost:11434',
+          'Cannot connect to Ollama. Make sure Ollama is running on ' + (process.env.OLLAMA_HOST || 'http://localhost:11434'),
           EmbeddingErrorCodes.API_ERROR,
           error
         );

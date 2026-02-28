@@ -49,7 +49,7 @@ export class MilvusStore {
       } as any);
       logger.info('Collection created');
     } catch (error) {
-      throw new MilvusError(`Failed to ensure collection: ${(error as Error).message}`, MilvusErrorCodes.CONNECTION_FAILED, error);
+      throw new MilvusError(`Failed to ensure collection: ${(error as Error).message}`, 'CONNECTION_FAILED', error);
     }
   }
 
@@ -60,7 +60,7 @@ export class MilvusStore {
       logger.info('Upsert completed', { count: result.insert_cnt });
       return Number(result.insert_cnt) || records.length;
     } catch (error) {
-      throw new MilvusError(`Upsert failed: ${(error as Error).message}`, MilvusErrorCodes.UPSERT_FAILED, error);
+      throw new MilvusError(`Upsert failed: ${(error as Error).message}`, 'UPSERT_FAILED', error);
     }
   }
 
@@ -81,7 +81,7 @@ export class MilvusStore {
         endLine: Number(r.entity.end_line),
       }));
     } catch (error) {
-      throw new MilvusError(`Search failed: ${(error as Error).message}`, MilvusErrorCodes.SEARCH_FAILED, error);
+      throw new MilvusError(`Search failed: ${(error as Error).message}`, 'SEARCH_FAILED', error);
     }
   }
 
@@ -90,7 +90,7 @@ export class MilvusStore {
       const result = await this.client.query({ collection_name: this.collection, filter: filterExpr, limit } as any);
       return result.data || [];
     } catch (error) {
-      throw new MilvusError(`Query failed: ${(error as Error).message}`, MilvusErrorCodes.QUERY_FAILED, error);
+      throw new MilvusError(`Query failed: ${(error as Error).message}`, 'QUERY_FAILED', error);
     }
   }
 
@@ -99,7 +99,7 @@ export class MilvusStore {
       await this.client.delete({ collection_name: this.collection, filter: `source == "${source}"` } as any);
       logger.info('Deleted by source', { source });
     } catch (error) {
-      throw new MilvusError(`Delete failed: ${(error as Error).message}`, MilvusErrorCodes.DELETE_FAILED, error);
+      throw new MilvusError(`Delete failed: ${(error as Error).message}`, 'DELETE_FAILED', error);
     }
   }
 
@@ -110,7 +110,7 @@ export class MilvusStore {
       await this.client.delete({ collection_name: this.collection, filter } as any);
       logger.info('Deleted by hashes', { count: hashes.length });
     } catch (error) {
-      throw new MilvusError(`Delete failed: ${(error as Error).message}`, MilvusErrorCodes.DELETE_FAILED, error);
+      throw new MilvusError(`Delete failed: ${(error as Error).message}`, 'DELETE_FAILED', error);
     }
   }
 
@@ -146,7 +146,7 @@ export class MilvusStore {
       await this.client.dropCollection({ collection_name: this.collection } as any);
       logger.info('Collection dropped');
     } catch (error) {
-      throw new MilvusError(`Reset failed: ${(error as Error).message}`, MilvusErrorCodes.CONNECTION_FAILED, error);
+      throw new MilvusError(`Reset failed: ${(error as Error).message}`, 'CONNECTION_FAILED', error);
     }
   }
 }

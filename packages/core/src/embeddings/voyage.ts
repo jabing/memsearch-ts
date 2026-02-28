@@ -76,7 +76,7 @@ export class VoyageEmbedding implements IEmbeddingProvider {
       if (err.status === 429) {
         throw new EmbeddingError(
           'Voyage rate limit exceeded',
-          EmbeddingErrorCodes.RATE_LIMIT,
+          'RATE_LIMIT',
           error
         );
       }
@@ -84,14 +84,14 @@ export class VoyageEmbedding implements IEmbeddingProvider {
       if (err.status === 401) {
         throw new EmbeddingError(
           'Voyage authentication failed. Check your API key.',
-          EmbeddingErrorCodes.API_KEY_MISSING,
+          'API_KEY_MISSING',
           error
         );
       }
 
       throw new EmbeddingError(
         `Voyage embedding failed: ${err.message}`,
-        EmbeddingErrorCodes.API_ERROR,
+        'API_ERROR',
         error
       );
     }

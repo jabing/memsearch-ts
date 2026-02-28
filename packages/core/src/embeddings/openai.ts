@@ -77,7 +77,7 @@ export class OpenAIEmbedding implements IEmbeddingProvider {
       if (err.status === 429) {
         throw new EmbeddingError(
           'OpenAI rate limit exceeded',
-          EmbeddingErrorCodes.RATE_LIMIT,
+          'RATE_LIMIT',
           error
         );
       }
@@ -85,14 +85,14 @@ export class OpenAIEmbedding implements IEmbeddingProvider {
       if (err.status === 401) {
         throw new EmbeddingError(
           'OpenAI authentication failed. Check your API key.',
-          EmbeddingErrorCodes.API_KEY_MISSING,
+          'API_KEY_MISSING',
           error
         );
       }
 
       throw new EmbeddingError(
         `OpenAI embedding failed: ${err.message}`,
-        EmbeddingErrorCodes.API_ERROR,
+        'API_ERROR',
         error
       );
     }

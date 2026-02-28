@@ -79,7 +79,7 @@ export function validateApiKey(apiKey: string | undefined, provider: string): as
   if (!apiKey) {
     throw new EmbeddingError(
       `${provider} API key not found. Set ${getEnvVarForProvider(provider)} environment variable.`,
-      EmbeddingErrorCodes.API_KEY_MISSING
+      'API_KEY_MISSING'
     );
   }
 }
