@@ -4,6 +4,7 @@
 
 import { MemSearch } from 'memsearch-core';
 import { createLogger } from 'memsearch-core/utils';
+import type { MemSearchConfig } from 'memsearch-core';
 
 const logger = createLogger('cli:watch');
 
@@ -33,8 +34,10 @@ export async function watchCommand(paths: string[], options: WatchOptions): Prom
       },
     });
 
+    // Access config through type-safe manner
+    const config = (mem as unknown as { config: MemSearchConfig }).config;
     console.log(`✅ Watching for changes... (Ctrl+C to stop)`);
-    console.log(`   Paths: ${(mem as any).config.paths?.join(', ') || 'none'}`);
+    console.log(`   Paths: ${config.paths?.join(', ') || 'none'}`);
 
     // Handle graceful shutdown
     process.on('SIGINT', () => {

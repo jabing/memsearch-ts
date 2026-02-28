@@ -13,6 +13,12 @@ export interface ConfigOptions {
   resolved?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface ConfigValue {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export async function configCommand(
   action: string,
   key?: string,
@@ -86,6 +92,7 @@ async function initConfig(configPath: string): Promise<void> {
 }
 
 async function setConfig(configPath: string, key: string, value: string): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let config: any = {};
   
   if (existsSync(configPath)) {
@@ -100,7 +107,8 @@ async function setConfig(configPath: string, key: string, value: string): Promis
 
   // Set nested key (e.g., embedding.provider)
   const keys = key.split('.');
-  let current = config;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let current: any = config;
   for (let i = 0; i < keys.length - 1; i++) {
     if (!current[keys[i]]) current[keys[i]] = {};
     current = current[keys[i]];
@@ -121,9 +129,15 @@ async function getConfig(configPath: string, key: string): Promise<void> {
   const config = JSON.parse(content);
 
   const keys = key.split('.');
-  let value: any = config;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let value: unknown = config;
   for (const k of keys) {
-    value = value?.[k];
+    if (value && typeof value === 'object') {
+      value = (value as ConfigValue)[k];
+    } else {
+      value = undefined;
+      break;
+    }
   }
 
   if (value === undefined) {
