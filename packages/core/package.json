@@ -1,6 +1,6 @@
 {
   "name": "memsearch-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Semantic memory search core library for TypeScript/Node.js",
   "license": "MIT",
   "author": "memsearch team",

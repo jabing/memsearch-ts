@@ -1,12 +1,19 @@
 {
   "name": "memsearch-cli",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "CLI tool for memsearch-ts - semantic memory search",
   "license": "MIT",
   "author": "memsearch team",
   "type": "module",
-  "bin": { "memsearch": "./dist/index.js" },
-  "files": ["dist", "README.md", "LICENSE", "API.md"],
+  "bin": {
+    "memsearch": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "API.md"
+  ],
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
@@ -25,7 +32,18 @@
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   },
-  "engines": { "node": ">=18.0.0" },
-  "publishConfig": { "access": "public" },
-  "keywords": ["semantic-search", "vector-database", "milvus", "markdown", "memory", "rag"]
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "semantic-search",
+    "vector-database",
+    "milvus",
+    "markdown",
+    "memory",
+    "rag"
+  ]
 }
