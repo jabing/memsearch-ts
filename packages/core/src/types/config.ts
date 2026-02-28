@@ -1,4 +1,4 @@
-import { z } from 'zod';
+
 import type { MemSearchConfig } from './index.js';
 import { validateConfigWithZod } from './validation.js';
 

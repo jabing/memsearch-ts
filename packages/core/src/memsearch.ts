@@ -7,7 +7,7 @@ import type { MemSearchConfig, SearchResult, WatcherCallback, Chunk } from './ty
 import { MemSearchError } from './types/errors.js';
 import { getEmbeddingProvider, type IEmbeddingProvider } from './embeddings/index.js';
 import { MilvusStore, type MilvusRecord } from './store.js';
-import { chunkMarkdown, computeChunkId, computeContentHash } from './index.js';
+import { chunkMarkdown, computeChunkId } from './index.js';
 import { scanPaths } from './scanner.js';
 import { createLogger } from './utils/logger.js';
 

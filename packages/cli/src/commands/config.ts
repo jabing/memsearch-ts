@@ -4,7 +4,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
-import { createLogger } from 'memsearch-core/dist/utils/index.js';
+import { createLogger } from 'memsearch-core';
 
 const logger = createLogger('cli:config');
 

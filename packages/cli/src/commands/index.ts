@@ -3,7 +3,7 @@
  */
 
 import { MemSearch } from 'memsearch-core';
-import { createLogger } from 'memsearch-core/dist/utils/index.js';
+import { createLogger } from 'memsearch-core';
 import type { ProviderType } from 'memsearch-core';
 
 const logger = createLogger('cli:index');
