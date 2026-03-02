@@ -8,7 +8,18 @@ import { resolvePath } from './types/config.js';
 const logger = createLogger('store');
 
 export interface MilvusStoreOptions { uri: string; token?: string; collection: string; dimension?: number; }
-export interface MilvusRecord { chunk_hash: string; embedding: number[]; content: string; source: string; heading: string; heading_level: number; start_line: number; end_line: number; }
+export interface MilvusRecord { chunk_hash: string; embedding: number[]; content: string; source: string; heading: string; heading_level: number; start_line: number; end_line: number; 
+  // === Triple memory fields ===
+  memory_type?: string;
+  node_type?: string;
+  label?: string;
+  importance?: number;
+  memory_data?: string;
+  relations?: string;
+  created_at?: number;
+  updated_at?: number;
+  access_count?: number;
+}
 
 export class MilvusStore {
   private client: MilvusClient;
@@ -41,6 +52,16 @@ export class MilvusStore {
           { name: 'heading_level', data_type: DataType.Int64 },
           { name: 'start_line', data_type: DataType.Int64 },
           { name: 'end_line', data_type: DataType.Int64 },
+          // === Triple memory fields ===
+          { name: 'memory_type', data_type: DataType.VarChar, max_length: 16 },
+          { name: 'node_type', data_type: DataType.VarChar, max_length: 32 },
+          { name: 'label', data_type: DataType.VarChar, max_length: 256 },
+          { name: 'importance', data_type: DataType.Float },
+          { name: 'memory_data', data_type: DataType.VarChar, max_length: 65535 },
+          { name: 'relations', data_type: DataType.VarChar, max_length: 65535 },
+          { name: 'created_at', data_type: DataType.Int64 },
+          { name: 'updated_at', data_type: DataType.Int64 },
+          { name: 'access_count', data_type: DataType.Int64 },
         ] as any,
         index_params: [
           { field_name: 'embedding', index_type: 'FLAT', metric_type: 'COSINE' },
