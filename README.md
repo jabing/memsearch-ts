@@ -118,9 +118,6 @@ const path = await mem.findPath(startId, endId);
 
 See [API.md](./packages/core/API.md) for full Triple Memory documentation.
 
-memsearch stats
-```
-
 ---
 
 ## 📚 Documentation
