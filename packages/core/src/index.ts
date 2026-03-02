@@ -15,7 +15,22 @@ export type {
   SearchResult,
   MemSearchConfig,
   WatcherCallback,
+  // Memory types
+  MemoryType,
+  Memory,
+  SemanticMemory,
+  EpisodicMemory,
+  ProceduralMemory,
+  MemoryInput,
+  MemorySearchOptions,
+  MemorySearchResult,
+  MemoryStats,
+  RelationInput,
+  SemanticNodeType,
+  EpisodeType,
+  SkillType,
 } from './types/index.js';
+
 
 // Chunk utilities
 export {
