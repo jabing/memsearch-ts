@@ -23,6 +23,7 @@ A TypeScript/Node.js semantic memory search engine for markdown knowledge bases,
 - 🎯 **Type-safe** — Full TypeScript support with strict mode
 - 🌐 **Multiple embeddings** — OpenAI, Google, Ollama, Voyage
 - 🗄️ **Flexible backends** — Milvus Lite, Server, Zilliz Cloud
+- 🧠 **Triple Memory** — Semantic, Episodic, and Procedural memory with graph traversal
 
 ---
 
@@ -73,6 +74,50 @@ memsearch search "how to configure Redis caching"
 memsearch watch ./memory/
 
 # Show statistics
+memsearch stats
+```
+
+### Triple Memory Usage
+
+```typescript
+// Add semantic memory (concepts, facts)
+const conceptId = await mem.addMemory({
+  type: 'semantic',
+  content: 'Redis is an in-memory data store',
+  label: 'Redis',
+  nodeType: 'concept',
+  importance: 0.8,
+});
+
+// Add episodic memory (events, experiences)
+const episodeId = await mem.addMemory({
+  type: 'episodic',
+  content: 'Fixed production outage by restarting Redis',
+  episodeType: 'bugfix',
+  importance: 0.9,
+});
+
+// Add procedural memory (workflows)
+const workflowId = await mem.addMemory({
+  type: 'procedural',
+  content: 'Database backup procedure',
+  skillType: 'workflow',
+  data: { steps: ['Stop writes', 'Create snapshot', 'Resume writes'] },
+});
+
+// Search memories with type filter
+const concepts = await mem.searchMemory('redis', { memoryType: 'semantic' });
+
+// Add relations between memories
+await mem.addRelation(episodeId, { targetId: conceptId, type: 'applied' });
+
+// Graph traversal - find related memories
+const neighbors = await mem.getNeighbors(conceptId, { depth: 2 });
+const path = await mem.findPath(startId, endId);
+```
+
+See [API.md](./packages/core/API.md) for full Triple Memory documentation.
+
 memsearch stats
 ```
 
