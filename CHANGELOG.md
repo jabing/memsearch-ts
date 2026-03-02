@@ -2,6 +2,37 @@
 
 All notable changes to memsearch-ts will be documented in this file.
 
+## [1.1.0] - 2026-03-02
+
+### Added
+
+- **Triple Memory Support** - Semantic, Episodic, and Procedural memory types
+- **12 New API Methods**:
+  - Memory CRUD: `addMemory()`, `getMemory()`, `updateMemory()`, `deleteMemory()`
+  - Memory Search: `searchMemory()`, `getStats()`, `addMemories()`
+  - Relations: `addRelation()`, `getRelations()`, `deleteRelation()`
+  - Graph Traversal: `getNeighbors()`, `findPath()`
+- **In-memory Graph Engine** - BFS traversal with 1-3 hop neighbors
+- **Collection Migration Utilities** - Schema migration for existing data
+- **14 New Type Definitions** - Memory, MemoryInput, MemoryRelation, etc.
+- **Integration Tests** - 14 new tests for end-to-end workflows
+
+### Changed
+
+- Extended MilvusRecord with 9 new fields for memory metadata
+- Total tests: 102 (was 88)
+
+### Documentation
+
+- Extended API.md with triple memory documentation (+271 lines)
+- Added usage examples for all three memory types
+
+### Backward Compatibility
+
+- All existing APIs unchanged
+- No breaking changes
+- 100% backward compatible
+
 ## [1.0.0] - 2026-02-28
 
 ### Added
