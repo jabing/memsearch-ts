@@ -90,3 +90,7 @@ export type { ChunkOptions } from './chunker.js';
 
 // Scanner
 export { scanPaths } from './scanner.js';
+// Graph engine
+export { MemoryGraph } from './graph.js';
+export type { GraphNode, GraphEdge } from './graph.js';
+export type { RelationType, TraversalDirection, MemoryRelation, NeighborOptions, PathOptions } from './types/memory.js';

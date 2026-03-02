@@ -1,0 +1,84 @@
+# Task 03 - Graph Engine Test Evidence
+
+## Test Results
+
+All 46 tests passed.
+
+```
+ ✓ src/graph.test.ts (46 tests) 21ms
+
+ Test Files  1 passed (1)
+      Tests  46 passed (46)
+   Start at  00:59:50
+   Duration  396ms
+```
+
+## Test Categories
+
+### Node Operations (7 tests)
+- ✓ should add a node
+- ✓ should add a node with data
+- ✓ should update node data when adding existing node
+- ✓ should remove a node
+- ✓ should remove all edges when removing a node
+- ✓ should return undefined for non-existent node
+- ✓ should track creation timestamp
+
+### Edge Operations (8 tests)
+- ✓ should add an edge
+- ✓ should auto-create nodes when adding edge
+- ✓ should add edge with confidence
+- ✓ should remove an edge
+- ✓ should return false when removing non-existent edge
+- ✓ should get edges between nodes
+- ✓ should support multiple edges between same nodes
+
+### Relation Queries (4 tests)
+- ✓ should get outgoing relations
+- ✓ should get incoming relations
+- ✓ should get both directions
+- ✓ should filter by relation types
+
+### Neighbor Queries (8 tests)
+- ✓ should get 1-hop neighbors
+- ✓ should get 2-hop neighbors
+- ✓ should get 3-hop neighbors
+- ✓ should not include starting node in results
+- ✓ should return empty array for non-existent node
+- ✓ should filter by relation types
+- ✓ should handle incoming direction
+- ✓ should handle both directions
+
+### Path Finding (9 tests)
+- ✓ should find direct path
+- ✓ should find multi-hop path
+- ✓ should find shortest path
+- ✓ should return null for disconnected nodes
+- ✓ should return null for non-existent nodes
+- ✓ should return single-element path for same node
+- ✓ should respect maxDepth
+- ✓ should filter by relation types
+- ✓ should handle incoming direction
+
+### Serialization (4 tests)
+- ✓ should serialize to JSON
+- ✓ should deserialize from JSON
+- ✓ should preserve edge IDs after serialization
+- ✓ should handle empty graph serialization
+
+### Utilities (4 tests)
+- ✓ should return correct size
+- ✓ should clear the graph
+- ✓ should get all node IDs
+- ✓ should get all edges
+
+### Performance (3 tests)
+- ✓ should handle 1000 nodes and 3-hop query under 100ms
+- ✓ should handle path finding efficiently
+- ✓ should handle serialization efficiently
+
+## Files Created
+
+1. `packages/core/src/types/memory.ts` - Memory type definitions
+2. `packages/core/src/graph.ts` - MemoryGraph class implementation
+3. `packages/core/src/graph.test.ts` - Comprehensive test suite
