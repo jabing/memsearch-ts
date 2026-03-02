@@ -106,6 +106,36 @@ export class MilvusStore {
     }
   }
 
+  async searchWithFilter(vector: number[], filter?: string, topK = 10): Promise<any[]> {
+    try {
+      const result = await this.client.search({
+        collection_name: this.collection,
+        data: [vector],
+        limit: topK,
+        filter,
+        output_fields: ['chunk_hash', 'content', 'source', 'heading', 'memory_type', 'node_type', 'label', 'importance', 'memory_data', 'relations', 'created_at', 'updated_at', 'access_count'],
+      } as any);
+      return (result.results || []).map((r: any) => ({
+        chunk_hash: r.entity.chunk_hash,
+        content: r.entity.content,
+        source: r.entity.source,
+        heading: r.entity.heading,
+        memory_type: r.entity.memory_type,
+        node_type: r.entity.node_type,
+        label: r.entity.label,
+        importance: r.entity.importance,
+        memory_data: r.entity.memory_data,
+        relations: r.entity.relations,
+        created_at: r.entity.created_at,
+        updated_at: r.entity.updated_at,
+        access_count: r.entity.access_count,
+        score: r.score,
+      }));
+    } catch (error) {
+      throw new MilvusError(`Search with filter failed: ${(error as Error).message}`, 'SEARCH_FAILED', error);
+    }
+  }
+
   async query(filterExpr: string, limit = 1000): Promise<any[]> {
     try {
       const result = await this.client.query({ collection_name: this.collection, filter: filterExpr, limit } as any);
