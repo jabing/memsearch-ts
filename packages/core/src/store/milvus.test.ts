@@ -4,7 +4,7 @@
  * Tests all public methods with mocked MilvusClient
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { MilvusStore, MilvusStoreOptions, MilvusRecord } from '../store.js';
+import { MilvusStore, MilvusStoreOptions, MilvusRecord } from './index.js';
 import { MilvusError } from '../types/errors.js';
 
 // Mock data store for testing
@@ -350,7 +350,7 @@ describe('MilvusStore', () => {
 
     it('should accept custom topK', async () => {
       const vector = [0.1, 0.2, 0.3];
-      await store.search(vector, undefined, 5);
+      await store.search(vector, { topK: 5 });
 
       expect(mockClient.search).toHaveBeenCalledWith(expect.objectContaining({ limit: 5 }));
     });

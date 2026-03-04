@@ -18,7 +18,7 @@ import type {
 } from './types/index.js';
 import { MemSearchError } from './types/errors.js';
 import { getEmbeddingProvider, type IEmbeddingProvider } from './embeddings/index.js';
-import { MilvusStore, type MilvusRecord } from './store.js';
+import { MilvusStore, type MilvusRecord } from './store/index.js';
 import { MemoryGraph } from './graph.js';
 import { chunkMarkdown, computeChunkId } from './index.js';
 import { scanPaths } from './scanner.js';
@@ -166,7 +166,7 @@ export class MemSearch {
     if (!embedding) {
       throw new MemSearchError('Failed to generate query embedding');
     }
-    const results = await this.store.search(embedding, query, topK);
+    const results = await this.store.search(embedding, { topK });
 
     logger.info('Search completed', { results: results.length });
     return results;
