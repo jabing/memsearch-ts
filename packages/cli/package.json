@@ -1,6 +1,6 @@
 {
   "name": "memsearch-cli",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "CLI tool for memsearch-ts - semantic memory search",
   "license": "MIT",
   "author": "memsearch team",
@@ -23,7 +23,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "memsearch-core": "^1.3.0",
+    "memsearch-core": "^1.3.2",
     "commander": "^12.0.0"
   },
   "devDependencies": {

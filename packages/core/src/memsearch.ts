@@ -17,7 +17,11 @@ import type {
   MemoryRelation,
 } from './types/index.js';
 import { MemSearchError } from './types/errors.js';
-import { getEmbeddingProvider, type IEmbeddingProvider } from './embeddings/index.js';
+import {
+  getEmbeddingProvider,
+  type IEmbeddingProvider,
+  KNOWN_DIMENSIONS,
+} from './embeddings/index.js';
 import { createVectorStore, type IVectorStore, type MilvusRecord } from './store/index.js';
 import { MemoryGraph } from './graph.js';
 import { chunkMarkdown, computeChunkId } from './index.js';
@@ -36,7 +40,27 @@ export class MemSearch {
     this.config = validateConfig(config);
 
     const vectorStoreOptions: Parameters<typeof createVectorStore>[0] = {};
-    if (config.milvus?.uri) {
+    const embeddingModel = this.config.embedding.model as string;
+    const dimension = KNOWN_DIMENSIONS[embeddingModel];
+
+    if (dimension) {
+      vectorStoreOptions.dimension = dimension;
+    }
+
+    if (this.config.vectorStore) {
+      if (this.config.vectorStore.provider === 'milvus' && this.config.vectorStore.milvus?.uri) {
+        vectorStoreOptions.milvus = {
+          uri: this.config.vectorStore.milvus.uri,
+          token: this.config.vectorStore.milvus.token,
+          collection: this.config.vectorStore.milvus.collection || 'memsearch_chunks',
+        };
+      } else if (this.config.vectorStore.provider === 'lancedb') {
+        vectorStoreOptions.lancedb = {
+          uri: this.config.vectorStore.lancedb.uri,
+          table: this.config.vectorStore.lancedb.table,
+        };
+      }
+    } else if (config.milvus?.uri) {
       vectorStoreOptions.milvus = {
         uri: this.config.milvus.uri as string,
         token: this.config.milvus.token,
@@ -46,9 +70,18 @@ export class MemSearch {
 
     this.store = createVectorStore(vectorStoreOptions);
     this.graph = new MemoryGraph();
+
+    const provider = vectorStoreOptions.milvus?.uri ? 'milvus' : 'lancedb';
+    const collection =
+      vectorStoreOptions.milvus?.collection ||
+      vectorStoreOptions.lancedb?.table ||
+      'memsearch_chunks';
+
     logger.info('MemSearch initialized', {
-      provider: this.config.embedding.provider,
-      collection: this.config.milvus.collection ?? 'memsearch_chunks',
+      embeddingProvider: this.config.embedding.provider,
+      vectorStoreProvider: provider,
+      collection,
+      dimension,
     });
   }
 

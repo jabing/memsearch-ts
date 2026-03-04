@@ -54,7 +54,7 @@ vi.mock('@zilliz/milvus2-sdk-node', () => ({
     search: vi.fn().mockImplementation((data: any) => {
       // Return records sorted by mock score with entity wrapper
       let records = Array.from(mockRecords.values()).filter((r) => r.embedding);
-      
+
       // Handle memory_type filter
       if (data?.filter && typeof data.filter === 'string') {
         const typeMatch = data.filter.match(/memory_type == "([^"]+)"/);
@@ -62,10 +62,10 @@ vi.mock('@zilliz/milvus2-sdk-node', () => ({
           records = records.filter((r) => r.memory_type === typeMatch[1]);
         }
       }
-      
-      const results = records.map((r) => ({ 
+
+      const results = records.map((r) => ({
         entity: r,
-        score: 0.85 + Math.random() * 0.1 
+        score: 0.85 + Math.random() * 0.1,
       }));
       return { results };
     }),
@@ -101,6 +101,9 @@ vi.mock('./embeddings/index.js', () => ({
     }),
     modelName: 'text-embedding-3-small',
   }),
+  KNOWN_DIMENSIONS: {
+    'text-embedding-3-small': 1536,
+  },
 }));
 
 describe('Triple Memory Integration', () => {

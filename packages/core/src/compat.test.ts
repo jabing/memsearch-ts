@@ -171,6 +171,9 @@ vi.mock('./embeddings/index.js', () => ({
     }),
     modelName: 'text-embedding-3-small',
   }),
+  KNOWN_DIMENSIONS: {
+    'text-embedding-3-small': 1536,
+  },
 }));
 
 describe('Backward Compatibility Tests', () => {
