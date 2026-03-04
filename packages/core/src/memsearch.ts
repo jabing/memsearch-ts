@@ -35,14 +35,14 @@ export class MemSearch {
   constructor(config: MemSearchConfig) {
     this.config = validateConfig(config);
     this.store = new MilvusStore({
-      uri: this.config.milvus.uri,
-      token: this.config.milvus.token,
-      collection: this.config.milvus.collection,
+      uri: this.config.milvus.uri ?? '~/.memsearch/milvus.db',
+      token: this.config.milvus.token ?? '',
+      collection: this.config.milvus.collection ?? 'memsearch_chunks',
     });
     this.graph = new MemoryGraph();
     logger.info('MemSearch initialized', {
       provider: this.config.embedding.provider,
-      collection: this.config.milvus.collection,
+      collection: this.config.milvus.collection ?? 'memsearch_chunks',
     });
   }
 

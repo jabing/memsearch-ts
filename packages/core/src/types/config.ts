@@ -1,5 +1,4 @@
-
-import type { MemSearchConfig } from './index.js';
+import type { LanceDBConfig, MemSearchConfig, MilvusConfig, VectorStoreConfig } from './index.js';
 import { validateConfigWithZod } from './validation.js';
 
 /**
@@ -11,6 +10,13 @@ export const DEFAULT_CONFIG: Required<MemSearchConfig> = {
     provider: 'openai',
     model: 'text-embedding-3-small',
     batchSize: 0,
+  },
+  vectorStore: {
+    provider: 'lancedb',
+    lancedb: {
+      uri: '~/.memsearch/lancedb.db',
+      table: 'memsearch_chunks',
+    },
   },
   milvus: {
     uri: '~/.memsearch/milvus.db',
@@ -49,7 +55,7 @@ export function resolvePath(path: string): string {
  */
 export function validateConfig(config: MemSearchConfig): Required<MemSearchConfig> {
   const validated = validateConfigWithZod(config);
-  
+
   // Merge with defaults
   return {
     paths: validated.paths,
@@ -58,10 +64,17 @@ export function validateConfig(config: MemSearchConfig): Required<MemSearchConfi
       model: validated.embedding.model ?? DEFAULT_MODELS[validated.embedding.provider],
       batchSize: validated.embedding.batchSize,
     },
+    vectorStore: validated.vectorStore ?? {
+      provider: 'lancedb',
+      lancedb: {
+        uri: resolvePath('~/.memsearch/lancedb.db'),
+        table: 'memsearch_chunks',
+      },
+    },
     milvus: {
-      uri: resolvePath(validated.milvus.uri),
-      token: validated.milvus.token,
-      collection: validated.milvus.collection,
+      uri: validated.milvus?.uri ? resolvePath(validated.milvus.uri) : '~/.memsearch/milvus.db',
+      token: validated.milvus?.token ?? '',
+      collection: validated.milvus?.collection ?? 'memsearch_chunks',
     },
     chunking: {
       maxChunkSize: validated.chunking.maxChunkSize,
@@ -85,10 +98,17 @@ export function tryValidateConfig(
         model: validated.embedding.model ?? DEFAULT_MODELS[validated.embedding.provider],
         batchSize: validated.embedding.batchSize,
       },
+      vectorStore: validated.vectorStore ?? {
+        provider: 'lancedb',
+        lancedb: {
+          uri: resolvePath('~/.memsearch/lancedb.db'),
+          table: 'memsearch_chunks',
+        },
+      },
       milvus: {
-        uri: resolvePath(validated.milvus.uri),
-        token: validated.milvus.token,
-        collection: validated.milvus.collection,
+        uri: validated.milvus?.uri ? resolvePath(validated.milvus.uri) : '~/.memsearch/milvus.db',
+        token: validated.milvus?.token ?? '',
+        collection: validated.milvus?.collection ?? 'memsearch_chunks',
       },
       chunking: {
         maxChunkSize: validated.chunking.maxChunkSize,

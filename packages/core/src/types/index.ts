@@ -38,6 +38,31 @@ export interface SearchResult {
 }
 
 /** Configuration interfaces */
+
+/**
+ * LanceDB vector store configuration
+ */
+export interface LanceDBConfig {
+  uri: string;
+  table?: string;
+}
+
+/**
+ * Milvus vector store configuration (kept for backward compatibility)
+ */
+export interface MilvusConfig {
+  uri?: string;
+  token?: string;
+  collection?: string;
+}
+
+/**
+ * Vector store configuration - supports multiple backends
+ */
+export type VectorStoreConfig =
+  | { provider: 'lancedb'; lancedb: LanceDBConfig }
+  | { provider: 'milvus'; milvus: MilvusConfig };
+
 export interface MemSearchConfig {
   paths?: string[];
   embedding?: {
@@ -45,11 +70,10 @@ export interface MemSearchConfig {
     model?: string;
     batchSize?: number;
   };
-  milvus: {
-    uri: string;
-    token?: string;
-    collection: string;
-  };
+  /** Vector store configuration (new approach) */
+  vectorStore?: VectorStoreConfig;
+  /** @deprecated Use vectorStore instead. Kept for backward compatibility. */
+  milvus?: MilvusConfig;
   chunking?: {
     maxChunkSize?: number;
     overlapLines?: number;
@@ -57,11 +81,7 @@ export interface MemSearchConfig {
 }
 
 /** File watcher event callback */
-export type WatcherCallback = (
-  eventType: string,
-  summary: string,
-  filePath: string
-) => void;
+export type WatcherCallback = (eventType: string, summary: string, filePath: string) => void;
 
 // Re-export all types and utilities
 export * from './chunk.js';
