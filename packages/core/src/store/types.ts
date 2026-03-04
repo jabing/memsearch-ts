@@ -183,4 +183,30 @@ export interface IVectorStore {
    * @returns Set of chunk hashes
    */
   getIdsBySource(source: string): Promise<Set<string>>;
+
+  // === Backward Compatibility Methods ===
+
+  /**
+   * Delete records by source path
+   * @deprecated Use delete() with filter expression instead
+   */
+  deleteBySource(source: string): Promise<void>;
+
+  /**
+   * Delete records by chunk hashes
+   * @deprecated Use deleteByIds() instead
+   */
+  deleteByHashes(hashes: string[]): Promise<void>;
+
+  /**
+   * Get all indexed sources
+   * @deprecated Use getSources() instead
+   */
+  indexedSources(): Promise<Set<string>>;
+
+  /**
+   * Get hashes by source
+   * @deprecated Use getIdsBySource() instead
+   */
+  hashesBySource(source: string): Promise<Set<string>>;
 }

@@ -450,7 +450,9 @@ export class LanceDBStore implements IVectorStore {
       const results = await this.table.query().select(['source']).limit(10000).toArray();
 
       const sources = new Set<string>();
-      results.forEach((r: { source: string }) => sources.add(r.source));
+      for (const r of results) {
+        sources.add(r.source);
+      }
       return sources;
     } catch {
       return new Set();
@@ -474,10 +476,28 @@ export class LanceDBStore implements IVectorStore {
         .toArray();
 
       const ids = new Set<string>();
-      results.forEach((r: { chunk_hash: string }) => ids.add(r.chunk_hash));
+      for (const r of results) {
+        ids.add(r.chunk_hash);
+      }
       return ids;
     } catch {
       return new Set();
     }
+  }
+
+  async deleteBySource(source: string): Promise<void> {
+    return this.delete(`source = '${source}'`);
+  }
+
+  async deleteByHashes(hashes: string[]): Promise<void> {
+    return this.deleteByIds(hashes);
+  }
+
+  async indexedSources(): Promise<Set<string>> {
+    return this.getSources();
+  }
+
+  async hashesBySource(source: string): Promise<Set<string>> {
+    return this.getIdsBySource(source);
   }
 }

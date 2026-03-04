@@ -18,7 +18,7 @@ import type {
 } from './types/index.js';
 import { MemSearchError } from './types/errors.js';
 import { getEmbeddingProvider, type IEmbeddingProvider } from './embeddings/index.js';
-import { MilvusStore, type MilvusRecord } from './store/index.js';
+import { createVectorStore, type IVectorStore, type MilvusRecord } from './store/index.js';
 import { MemoryGraph } from './graph.js';
 import { chunkMarkdown, computeChunkId } from './index.js';
 import { scanPaths } from './scanner.js';
@@ -29,15 +29,17 @@ const logger = createLogger('memsearch');
 export class MemSearch {
   private config: Required<MemSearchConfig>;
   private embedder: IEmbeddingProvider | null = null;
-  private store: MilvusStore;
+  private store: IVectorStore;
   private graph: MemoryGraph;
 
   constructor(config: MemSearchConfig) {
     this.config = validateConfig(config);
-    this.store = new MilvusStore({
-      uri: this.config.milvus.uri ?? '~/.memsearch/milvus.db',
-      token: this.config.milvus.token ?? '',
-      collection: this.config.milvus.collection ?? 'memsearch_chunks',
+    this.store = createVectorStore({
+      milvus: {
+        uri: this.config.milvus.uri ?? '~/.memsearch/milvus.db',
+        token: this.config.milvus.token ?? '',
+        collection: this.config.milvus.collection ?? 'memsearch_chunks',
+      },
     });
     this.graph = new MemoryGraph();
     logger.info('MemSearch initialized', {
@@ -199,7 +201,7 @@ export class MemSearch {
     this.store.close();
   }
 
-  getStore(): MilvusStore {
+  getStore(): IVectorStore {
     return this.store;
   }
 
