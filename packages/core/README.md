@@ -79,6 +79,8 @@ Best for personal use, development, and single-agent applications.
 
 Enable for BM25 hybrid search and multi-process support:
 
+**Legacy format (still supported):**
+
 ```typescript
 const mem = new MemSearch({
   paths: ['./memory'],
@@ -86,6 +88,22 @@ const mem = new MemSearch({
   milvus: {
     uri: 'http://localhost:19530',
     collection: 'memsearch_chunks',
+  },
+});
+```
+
+**New recommended format (v1.3.0+):**
+
+```typescript
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  vectorStore: {
+    provider: 'milvus',
+    milvus: {
+      uri: 'http://localhost:19530',
+      collection: 'memsearch_chunks',
+    },
   },
 });
 ```

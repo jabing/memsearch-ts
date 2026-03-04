@@ -41,13 +41,15 @@ npm install -g memsearch-cli
 
 ### Basic Usage
 
+**Zero-config embedded mode (LanceDB, recommended):**
+
 ```typescript
 import { MemSearch } from 'memsearch-core';
 
 const mem = new MemSearch({
   paths: ['./memory'],
   embedding: { provider: 'openai', model: 'text-embedding-3-small' },
-  milvus: { uri: '~/.memsearch/milvus.db', collection: 'memsearch_chunks' },
+  // No vectorStore config needed - uses LanceDB by default
 });
 
 // Index markdown files
@@ -59,6 +61,33 @@ console.log(results[0].content, results[0].score);
 
 // Cleanup
 mem.close();
+```
+
+**With Milvus backend (legacy format):**
+
+```typescript
+import { MemSearch } from 'memsearch-core';
+
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  milvus: { uri: '~/.memsearch/milvus.db', collection: 'memsearch_chunks' },
+});
+```
+
+**With Milvus backend (new format, v1.3.0+):**
+
+```typescript
+import { MemSearch } from 'memsearch-core';
+
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  vectorStore: {
+    provider: 'milvus',
+    milvus: { uri: '~/.memsearch/milvus.db', collection: 'memsearch_chunks' },
+  },
+});
 ```
 
 ### CLI Usage
@@ -197,6 +226,8 @@ For production deployments requiring BM25 hybrid search or multi-process access:
 | **Milvus Server** | `http://localhost:19530`    | Multi-agent, team |
 | **Zilliz Cloud**  | `https://*.zillizcloud.com` | Production        |
 
+**Legacy format (still supported):**
+
 ```typescript
 const mem = new MemSearch({
   paths: ['./memory'],
@@ -204,6 +235,22 @@ const mem = new MemSearch({
   milvus: {
     uri: 'http://localhost:19530',
     collection: 'memsearch_chunks',
+  },
+});
+```
+
+**New recommended format (v1.3.0+):**
+
+```typescript
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  vectorStore: {
+    provider: 'milvus',
+    milvus: {
+      uri: 'http://localhost:19530',
+      collection: 'memsearch_chunks',
+    },
   },
   // Enables BM25 hybrid search and multi-process support
 });
@@ -265,4 +312,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for d
 
 ---
 
-**Status**: ✅ v1.0.0 Released
+**Status**: ✅ v1.3.2 Released
