@@ -9,7 +9,7 @@
 
 📝 **Markdown-first** · ⚡ **Smart dedup** · 🔍 **Hybrid search** · 🧩 **Claude Code plugin**
 
-A TypeScript/Node.js semantic memory search engine for markdown knowledge bases, built on Milvus vector database.
+A TypeScript/Node.js semantic memory search engine for markdown knowledge bases. Default 嵌入式 (embedded) mode uses LanceDB for zero-config setup, with optional Milvus backend for production deployments.
 
 ---
 
@@ -22,7 +22,7 @@ A TypeScript/Node.js semantic memory search engine for markdown knowledge bases,
 - 🧩 **Claude Code plugin** — Automatic persistent memory for Claude Code sessions
 - 🎯 **Type-safe** — Full TypeScript support with strict mode
 - 🌐 **Multiple embeddings** — OpenAI, Google, Ollama, Voyage
-- 🗄️ **Flexible backends** — Milvus Lite, Server, Zilliz Cloud
+- 🗄️ **Flexible backends** — Embedded LanceDB (default), Milvus Lite, Server, Zilliz Cloud
 - 🧠 **Triple Memory** — Semantic, Episodic, and Procedural memory with graph traversal
 
 ---
@@ -154,22 +154,60 @@ See [API.md](./packages/core/API.md) for full Triple Memory documentation.
 
 ## 🔌 Embedding Providers
 
-| Provider | Install | Default Model | Env Variable |
-|----------|---------|---------------|--------------|
-| OpenAI | Included | `text-embedding-3-small` | `OPENAI_API_KEY` |
-| Google | Optional | `gemini-embedding-001` | `GOOGLE_API_KEY` |
-| Voyage | Optional | `voyage-3-lite` | `VOYAGE_API_KEY` |
-| Ollama | Optional | `nomic-embed-text` | — (local) |
+| Provider | Install  | Default Model            | Env Variable     |
+| -------- | -------- | ------------------------ | ---------------- |
+| OpenAI   | Included | `text-embedding-3-small` | `OPENAI_API_KEY` |
+| Google   | Optional | `gemini-embedding-001`   | `GOOGLE_API_KEY` |
+| Voyage   | Optional | `voyage-3-lite`          | `VOYAGE_API_KEY` |
+| Ollama   | Optional | `nomic-embed-text`       | — (local)        |
 
 ---
 
-## 🗄️ Milvus Backend
+## 🗄️ Vector Store Backends
 
-| Mode | `milvus_uri` | Best for |
-|------|-------------|----------|
-| **Milvus Lite** | `~/.memsearch/milvus.db` | Personal use, dev |
-| **Milvus Server** | `http://localhost:19530` | Multi-agent, team |
-| **Zilliz Cloud** | `https://*.zillizcloud.com` | Production |
+### Embedded Mode (Default)
+
+Zero-config setup with LanceDB. No external database required.
+
+```typescript
+import { MemSearch } from 'memsearch-core';
+
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  // No vectorStore config needed - uses LanceDB by default
+  dataDir: '~/.memsearch', // Optional: defaults to ./memsearch_data
+});
+```
+
+**Important Limitations:**
+
+- **BM25 hybrid search not available** - Embedded mode uses dense vector search only. BM25 requires Milvus backend.
+- **Single-process only** - LanceDB doesn't support concurrent write access from multiple processes. Use Milvus for multi-agent scenarios.
+
+**Best for:** Personal use, development, single-agent applications, quick prototyping.
+
+### Milvus Backend (Optional)
+
+For production deployments requiring BM25 hybrid search or multi-process access:
+
+| Mode              | `milvus_uri`                | Best for          |
+| ----------------- | --------------------------- | ----------------- |
+| **Milvus Lite**   | `~/.memsearch/milvus.db`    | Personal use, dev |
+| **Milvus Server** | `http://localhost:19530`    | Multi-agent, team |
+| **Zilliz Cloud**  | `https://*.zillizcloud.com` | Production        |
+
+```typescript
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  milvus: {
+    uri: 'http://localhost:19530',
+    collection: 'memsearch_chunks',
+  },
+  // Enables BM25 hybrid search and multi-process support
+});
+```
 
 ---
 
@@ -228,4 +266,3 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for d
 ---
 
 **Status**: ✅ v1.0.0 Released
-

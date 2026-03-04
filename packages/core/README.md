@@ -39,17 +39,56 @@ mem.close();
 - 📝 **Markdown-first** — Your memories are just `.md` files
 - ⚡ **Smart dedup** — SHA-256 content hashing prevents duplicates
 - 🔄 **Live sync** — File watcher auto-indexes changes
-- 🔍 **Hybrid search** — Dense vector + BM25 + RRF reranking
+- 🔍 **Hybrid search** — Dense vector + BM25 + RRF reranking (Milvus backend only)
 - 🎯 **Type-safe** — Full TypeScript support
+- 🗄️ **Flexible backends** — Embedded LanceDB (default) or Milvus
 
 ## Embedding Providers
 
-| Provider | Model | Env Variable |
-|----------|-------|--------------|
-| OpenAI | `text-embedding-3-small` | `OPENAI_API_KEY` |
-| Google | `gemini-embedding-001` | `GOOGLE_API_KEY` |
-| Voyage | `voyage-3-lite` | `VOYAGE_API_KEY` |
-| Ollama | `nomic-embed-text` | — (local) |
+| Provider | Model                    | Env Variable     |
+| -------- | ------------------------ | ---------------- |
+| OpenAI   | `text-embedding-3-small` | `OPENAI_API_KEY` |
+| Google   | `gemini-embedding-001`   | `GOOGLE_API_KEY` |
+| Voyage   | `voyage-3-lite`          | `VOYAGE_API_KEY` |
+| Ollama   | `nomic-embed-text`       | — (local)        |
+
+## Vector Store Backends
+
+### Embedded Mode (Default)
+
+Uses LanceDB for zero-config setup. No external database required.
+
+```typescript
+import { MemSearch } from 'memsearch-core';
+
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  dataDir: '~/.memsearch', // Optional: defaults to ./memsearch_data
+});
+```
+
+**Limitations:**
+
+- **No BM25 hybrid search** - Dense vector search only
+- **Single-process only** - No concurrent write access
+
+Best for personal use, development, and single-agent applications.
+
+### Milvus Backend (Optional)
+
+Enable for BM25 hybrid search and multi-process support:
+
+```typescript
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai', model: 'text-embedding-3-small' },
+  milvus: {
+    uri: 'http://localhost:19530',
+    collection: 'memsearch_chunks',
+  },
+});
+```
 
 ## API Reference
 
