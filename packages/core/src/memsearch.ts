@@ -34,13 +34,17 @@ export class MemSearch {
 
   constructor(config: MemSearchConfig) {
     this.config = validateConfig(config);
-    this.store = createVectorStore({
-      milvus: {
-        uri: this.config.milvus.uri ?? '~/.memsearch/milvus.db',
-        token: this.config.milvus.token ?? '',
-        collection: this.config.milvus.collection ?? 'memsearch_chunks',
-      },
-    });
+
+    const vectorStoreOptions: Parameters<typeof createVectorStore>[0] = {};
+    if (config.milvus?.uri) {
+      vectorStoreOptions.milvus = {
+        uri: this.config.milvus.uri as string,
+        token: this.config.milvus.token,
+        collection: this.config.milvus.collection as string,
+      };
+    }
+
+    this.store = createVectorStore(vectorStoreOptions);
     this.graph = new MemoryGraph();
     logger.info('MemSearch initialized', {
       provider: this.config.embedding.provider,
