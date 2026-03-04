@@ -41,15 +41,15 @@ interface LanceDBRecord {
   start_line: number;
   end_line: number;
   // Triple memory fields (optional)
-  memory_type?: string;
-  node_type?: string;
-  label?: string;
-  importance?: number;
-  memory_data?: string;
-  relations?: string;
-  created_at?: number;
-  updated_at?: number;
-  access_count?: number;
+  memory_type: string | null | undefined;
+  node_type: string | null | undefined;
+  label: string | null | undefined;
+  importance: number | null | undefined;
+  memory_data: string | null | undefined;
+  relations: string | null | undefined;
+  created_at: number | null | undefined;
+  updated_at: number | null | undefined;
+  access_count: number | null | undefined;
 }
 
 /**
@@ -113,6 +113,15 @@ export class LanceDBStore implements IVectorStore {
         heading_level: 0,
         start_line: 0,
         end_line: 0,
+        memory_type: '',
+        node_type: '',
+        label: '',
+        importance: 0,
+        memory_data: '',
+        relations: '',
+        created_at: 0,
+        updated_at: 0,
+        access_count: 0,
       };
 
       this.table = await this.db.createTable(
@@ -386,7 +395,7 @@ export class LanceDBStore implements IVectorStore {
 
       const results = await this.table.query().where(convertFilter(filter)).limit(limit).toArray();
 
-      // Map to VectorRecord format
+      // Map to VectorRecord format (convert null to undefined)
       return results.map((r: LanceDBRecord) => ({
         chunk_hash: r.chunk_hash,
         embedding: r.embedding,
@@ -396,15 +405,15 @@ export class LanceDBStore implements IVectorStore {
         heading_level: r.heading_level,
         start_line: r.start_line,
         end_line: r.end_line,
-        memory_type: r.memory_type,
-        node_type: r.node_type,
-        label: r.label,
-        importance: r.importance,
-        memory_data: r.memory_data,
-        relations: r.relations,
-        created_at: r.created_at,
-        updated_at: r.updated_at,
-        access_count: r.access_count,
+        memory_type: r.memory_type ?? undefined,
+        node_type: r.node_type ?? undefined,
+        label: r.label ?? undefined,
+        importance: r.importance ?? undefined,
+        memory_data: r.memory_data ?? undefined,
+        relations: r.relations ?? undefined,
+        created_at: r.created_at ?? undefined,
+        updated_at: r.updated_at ?? undefined,
+        access_count: r.access_count ?? undefined,
       }));
     } catch (error) {
       throw new MemSearchError(
