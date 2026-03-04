@@ -11,11 +11,11 @@ export function convertFilter(milvusFilter: string): string {
 
   let result = milvusFilter;
   const stringLiterals: string[] = [];
-  const STRING_PLACEHOLDER = '\x00STR\x00';
+  const STRING_PLACEHOLDER = '__STRING_LITERAL__';
 
   result = result.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/g, (match) => {
     stringLiterals.push(match);
-    return `${STRING_PLACEHOLDER}${stringLiterals.length - 1}\x00`;
+    return `${STRING_PLACEHOLDER}${stringLiterals.length - 1}__`;
   });
 
   result = result.replace(/==/g, '=');
@@ -23,10 +23,7 @@ export function convertFilter(milvusFilter: string): string {
   result = result.replace(/\bor\b/gi, 'OR');
   result = result.replace(/\bin\b/gi, 'IN');
 
-  const placeholderRegex = new RegExp(
-    `${STRING_PLACEHOLDER.replace(/\x00/g, '\\x00')}(\\d+)\\x00`,
-    'g'
-  );
+  const placeholderRegex = new RegExp(`${STRING_PLACEHOLDER}(\\d+)__`, 'g');
   result = result.replace(placeholderRegex, (_, index: string) => {
     const original = stringLiterals[parseInt(index, 10)];
     if (!original) return '';

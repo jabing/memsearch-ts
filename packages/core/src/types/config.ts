@@ -1,4 +1,4 @@
-import type { LanceDBConfig, MemSearchConfig, MilvusConfig, VectorStoreConfig } from './index.js';
+import type { MemSearchConfig } from './index.js';
 import { validateConfigWithZod } from './validation.js';
 
 /**
