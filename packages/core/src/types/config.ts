@@ -27,6 +27,7 @@ export const DEFAULT_CONFIG: Required<MemSearchConfig> = {
     maxChunkSize: 1500,
     overlapLines: 2,
   },
+  logLevel: 'warn',
 };
 
 /**
@@ -80,6 +81,7 @@ export function validateConfig(config: MemSearchConfig): Required<MemSearchConfi
       maxChunkSize: validated.chunking.maxChunkSize,
       overlapLines: validated.chunking.overlapLines,
     },
+    logLevel: validated.logLevel ?? 'warn',
   };
 }
 
@@ -114,6 +116,7 @@ export function tryValidateConfig(
         maxChunkSize: validated.chunking.maxChunkSize,
         overlapLines: validated.chunking.overlapLines,
       },
+      logLevel: validated.logLevel ?? 'warn',
     };
     return { success: true, config: resolved };
   } catch (error) {

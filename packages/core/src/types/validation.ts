@@ -61,6 +61,7 @@ export const MemSearchConfigSchema = z.object({
   vectorStore: VectorStoreConfigSchema.optional(),
   milvus: MilvusConfigSchema.optional(),
   chunking: ChunkingConfigSchema.optional(),
+  logLevel: z.enum(['debug', 'info', 'warn', 'error', 'silent']).optional(),
 });
 
 /**
@@ -83,6 +84,7 @@ export const MemSearchConfigWithDefaultsSchema = MemSearchConfigSchema.transform
     maxChunkSize: data.chunking?.maxChunkSize ?? 1500,
     overlapLines: data.chunking?.overlapLines ?? 2,
   },
+  logLevel: data.logLevel ?? 'warn',
 }));
 
 /**

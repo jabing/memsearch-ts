@@ -26,7 +26,7 @@ import { createVectorStore, type IVectorStore, type MilvusRecord } from './store
 import { MemoryGraph } from './graph.js';
 import { chunkMarkdown, computeChunkId } from './index.js';
 import { scanPaths } from './scanner.js';
-import { createLogger } from './utils/logger.js';
+import { createLogger, setGlobalLogLevel } from './utils/logger.js';
 
 const logger = createLogger('memsearch');
 
@@ -38,6 +38,10 @@ export class MemSearch {
 
   constructor(config: MemSearchConfig) {
     this.config = validateConfig(config);
+
+    if (this.config.logLevel) {
+      setGlobalLogLevel(this.config.logLevel);
+    }
 
     const vectorStoreOptions: Parameters<typeof createVectorStore>[0] = {};
     const embeddingModel = this.config.embedding.model as string;

@@ -78,6 +78,8 @@ export interface MemSearchConfig {
     maxChunkSize?: number;
     overlapLines?: number;
   };
+  /** Log level for the library (default: 'warn') */
+  logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'silent';
 }
 
 /** File watcher event callback */
