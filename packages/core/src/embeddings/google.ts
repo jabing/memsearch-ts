@@ -1,7 +1,7 @@
 /**
  * Google (Gemini) Embedding Provider
- * 
- * Requires: @google/genai npm package (replaces @google/generative-ai)
+ *
+ * Requires: @google/generative-ai npm package
  * Environment: GOOGLE_API_KEY
  */
 
@@ -17,7 +17,7 @@ export class GoogleEmbedding implements IEmbeddingProvider {
   readonly modelName: string;
   readonly dimension: number;
   readonly providerName = 'google';
-  
+
   private client: GoogleGenerativeAI;
   private batchSize: number;
 
@@ -28,11 +28,14 @@ export class GoogleEmbedding implements IEmbeddingProvider {
     this.client = new GoogleGenerativeAI(apiKey);
     this.modelName = options.model || 'gemini-embedding-001';
     this.batchSize = options.batchSize || DEFAULT_BATCH_SIZES.google;
-    
+
     // Google gemini-embedding-001 outputs 3072 by default, but 768 is recommended
     this.dimension = options.dimension || 768;
-    
-    logger.info('GoogleEmbedding initialized', { model: this.modelName, dimension: this.dimension });
+
+    logger.info('GoogleEmbedding initialized', {
+      model: this.modelName,
+      dimension: this.dimension,
+    });
   }
 
   /**
@@ -65,18 +68,13 @@ export class GoogleEmbedding implements IEmbeddingProvider {
       logger.info('Embedding completed', { total: allEmbeddings.length });
       logger.info('Embedding completed', { total: allEmbeddings.length });
       return allEmbeddings;
-
     } catch (error) {
       const err = error as Error & { status?: number };
-      
+
       if (err.status === 429) {
-        throw new EmbeddingError(
-          'Google rate limit exceeded',
-          'RATE_LIMIT',
-          error
-        );
+        throw new EmbeddingError('Google rate limit exceeded', 'RATE_LIMIT', error);
       }
-      
+
       if (err.status === 401 || err.status === 403) {
         throw new EmbeddingError(
           'Google authentication failed. Check your API key.',
@@ -85,11 +83,7 @@ export class GoogleEmbedding implements IEmbeddingProvider {
         );
       }
 
-      throw new EmbeddingError(
-        `Google embedding failed: ${err.message}`,
-        'API_ERROR',
-        error
-      );
+      throw new EmbeddingError(`Google embedding failed: ${err.message}`, 'API_ERROR', error);
     }
   }
 
