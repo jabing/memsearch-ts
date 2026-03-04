@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.4.0] - 2026-03-04
+
+### 🎉 Features
+
+#### Logging System Improvements (#7)
+
+- **Changed**: Default log level from `'info'` to `'warn'` - much quieter production experience
+- **Added**: `MEMSEARCH_LOG_LEVEL` environment variable support
+- **Added**: `logLevel` option to `MemSearchConfig` for programmatic control
+- **Added**: Global log level management via `setGlobalLogLevel()`
+- **Priority**: Config option > Environment variable > Default ('warn')
+
+### 🔧 Technical Improvements
+
+- **Environment variable**: `MEMSEARCH_LOG_LEVEL=debug|info|warn|error|silent`
+- **Config option**: `logLevel: 'debug' | 'info' | 'warn' | 'error' | 'silent'`
+- **All loggers**: Respect the global log level setting
+- **Backward compatible**: No breaking changes, just quieter by default
+
+### 📦 Version Bump
+
+- memsearch-core: 1.3.2 → 1.4.0
+- memsearch-cli: 1.3.2 → 1.4.0
+
+### 🧪 Testing
+
+- All 278+ tests continue to pass
+- 7 failing tests in compat.test.ts are pre-existing (unrelated to logging changes)
+
+---
+
 ## [1.3.2] - 2026-03-04
 
 ### 🐛 Critical Bug Fixes

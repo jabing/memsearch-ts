@@ -50,17 +50,9 @@ const mem = new MemSearch({
   paths: ['./memory'],
   embedding: { provider: 'openai', model: 'text-embedding-3-small' },
   // No vectorStore config needed - uses LanceDB by default
+  // Optional: Set log level (default: 'warn')
+  logLevel: 'info', // or 'debug', 'warn', 'error', 'silent'
 });
-
-// Index markdown files
-await mem.index();
-
-// Semantic search
-const results = await mem.search('Redis caching', { topK: 5 });
-console.log(results[0].content, results[0].score);
-
-// Cleanup
-mem.close();
 ```
 
 **With Milvus backend (legacy format):**
@@ -146,6 +138,39 @@ const path = await mem.findPath(startId, endId);
 ```
 
 See [API.md](./packages/core/API.md) for full Triple Memory documentation.
+
+---
+
+## 🔧 Configuration
+
+### Log Level
+
+Control the verbosity of memsearch-ts logging:
+
+**Via Config:**
+
+```typescript
+const mem = new MemSearch({
+  paths: ['./memory'],
+  embedding: { provider: 'openai' },
+  logLevel: 'info', // Options: 'debug' | 'info' | 'warn' | 'error' | 'silent'
+});
+```
+
+**Via Environment Variable:**
+
+```bash
+export MEMSEARCH_LOG_LEVEL=info
+node your-app.js
+```
+
+**Log Levels:**
+
+- `debug`: Very verbose (debug + info + warn + error)
+- `info`: Informational messages (info + warn + error)
+- `warn`: Warnings only (warn + error) - **DEFAULT**
+- `error`: Errors only
+- `silent`: No output at all
 
 ---
 
