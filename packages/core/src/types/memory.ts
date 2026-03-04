@@ -80,7 +80,12 @@ export type SemanticNodeType = 'concept' | 'entity' | 'rule' | 'pattern' | 'api'
 /**
  * Episode types for episodic memory
  */
-export type EpisodeType = 'task_execution' | 'error_recovery' | 'learning' | 'decision' | 'exploration';
+export type EpisodeType =
+  | 'task_execution'
+  | 'error_recovery'
+  | 'learning'
+  | 'decision'
+  | 'exploration';
 
 /**
  * Skill types for procedural memory
@@ -234,6 +239,16 @@ export interface MemorySearchOptions {
   nodeType?: SemanticNodeType;
   filter?: string;
   includeRelations?: boolean;
+  /**
+   * Weight for time decay in scoring (0-1, default: 0.3)
+   * Higher values prioritize newer memories more
+   */
+  timeDecayWeight?: number;
+  /**
+   * Half-life for time decay in milliseconds (default: 7 days)
+   * After this time, the time score is reduced by 50%
+   */
+  timeDecayHalfLife?: number;
 }
 
 /**
@@ -241,7 +256,18 @@ export interface MemorySearchOptions {
  */
 export interface MemorySearchResult {
   memory: Memory;
+  /**
+   * Original similarity score
+   */
   score: number;
+  /**
+   * Time-based score (0-1)
+   */
+  timeScore: number;
+  /**
+   * Combined score (similarity + time decay)
+   */
+  combinedScore: number;
   path?: Memory[];
 }
 
@@ -258,4 +284,3 @@ export interface MemoryStats {
   };
   avgImportance: number;
 }
-

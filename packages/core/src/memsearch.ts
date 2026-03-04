@@ -27,6 +27,7 @@ import { MemoryGraph } from './graph.js';
 import { chunkMarkdown, computeChunkId } from './index.js';
 import { scanPaths } from './scanner.js';
 import { createLogger, setGlobalLogLevel } from './utils/logger.js';
+import { calculateTimeScore } from './utils/time-decay.js';
 
 const logger = createLogger('memsearch');
 
@@ -349,6 +350,8 @@ export class MemSearch {
   async searchMemory(query: string, options?: MemorySearchOptions): Promise<MemorySearchResult[]> {
     const embedder = await this.getEmbedder();
     const topK = options?.topK ?? 10;
+    const timeDecayWeight = options?.timeDecayWeight ?? 0.3;
+    const timeDecayHalfLife = options?.timeDecayHalfLife ?? 7 * 24 * 60 * 60 * 1000;
 
     const embeddings = await embedder.embed([query]);
     const embedding = embeddings[0]!;
@@ -364,10 +367,25 @@ export class MemSearch {
 
     const results = await this.store.searchWithFilter(embedding, filter, topK);
 
-    return results.map((r: any) => ({
-      memory: this.recordToMemory(r),
-      score: r.score ?? 0,
-    }));
+    const scoredResults = results.map((r: any) => {
+      const memory = this.recordToMemory(r);
+      const semanticScore = r.score ?? 0;
+      const normalizedSemantic = 1 - semanticScore; // Convert from 0=best to 1=best
+      const timeScore = calculateTimeScore(memory.createdAt, timeDecayHalfLife);
+      const combinedScore =
+        (1 - timeDecayWeight) * normalizedSemantic + timeDecayWeight * timeScore;
+
+      return {
+        memory,
+        score: semanticScore,
+        timeScore,
+        combinedScore,
+      };
+    });
+
+    // Sort by combinedScore descending and maintain topK limit
+    scoredResults.sort((a, b) => b.combinedScore - a.combinedScore);
+    return scoredResults.slice(0, topK);
   }
 
   async getStats(): Promise<MemoryStats> {
