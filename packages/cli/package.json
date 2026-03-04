@@ -23,7 +23,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "memsearch-core": "workspace:*",
+    "memsearch-core": "^1.3.0",
     "commander": "^12.0.0"
   },
   "devDependencies": {
