@@ -231,7 +231,7 @@ describe('LanceDBStore', () => {
 
       await expect(newStore.upsert([record])).rejects.toThrow(MemSearchError);
       await expect(newStore.upsert([record])).rejects.toMatchObject({
-        code: 'LANCEDB_TABLE_NOT_INITIALIZED',
+        code: 'LANCEDB_UPSERT_FAILED',
       });
 
       newStore.close();

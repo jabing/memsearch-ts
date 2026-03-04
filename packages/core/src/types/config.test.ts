@@ -12,7 +12,7 @@ describe('validateConfig', () => {
   it('should resolve tilde paths', () => {
     const config = { milvus: { uri: '~/.memsearch/milvus.db' } };
     const result = validateConfig(config);
-    expect(result.milvus.uri.startsWith('~')).toBe(false);
+    expect(result.milvus?.uri?.startsWith('~')).toBe(false);
   });
 });
 
@@ -23,7 +23,9 @@ describe('tryValidateConfig', () => {
   });
 
   it('should return errors for invalid config', () => {
-    const result = tryValidateConfig({ invalid: 'config' });
+    const result = tryValidateConfig({
+      embedding: { provider: 'invalid_provider' as any },
+    });
     expect(result.success).toBe(false);
   });
 });

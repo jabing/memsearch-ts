@@ -271,8 +271,7 @@ export class LanceDBStore implements IVectorStore {
         );
       }
 
-      // Build IN filter for chunk_hash
-      const filter = `chunk_hash IN [${ids.map((id) => `'${id}'`).join(', ')}]`;
+      const filter = `chunk_hash IN (${ids.map((id) => `'${id}'`).join(', ')})`;
       await this.table.delete(filter);
       logger.info('Deleted by IDs', { count: ids.length });
     } catch (error) {
