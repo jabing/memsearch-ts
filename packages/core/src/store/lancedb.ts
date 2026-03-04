@@ -89,12 +89,30 @@ export class LanceDBStore implements IVectorStore {
         logger.info('Connected to LanceDB', { uri: this.uri });
       }
 
-      // Check if table exists
-      const tableNames = await this.db.tableNames();
-      if (tableNames.includes(this.tableName)) {
+      // Try to use tableNames() if available
+      let tableExists = false;
+      try {
+        if (typeof (this.db as any).tableNames === 'function') {
+          const tableNames = await (this.db as any).tableNames();
+          tableExists = tableNames.includes(this.tableName);
+        }
+      } catch {
+        // tableNames() failed, will try openTable directly
+      }
+
+      if (tableExists) {
         this.table = await this.db.openTable(this.tableName);
         logger.info('Table opened', { table: this.tableName });
         return;
+      }
+
+      // If tableNames() not available or didn't find table, try openTable directly
+      try {
+        this.table = await this.db.openTable(this.tableName);
+        logger.info('Table opened', { table: this.tableName });
+        return;
+      } catch {
+        // Table doesn't exist - need to create it
       }
 
       // Need dimension to create new table
@@ -162,10 +180,28 @@ export class LanceDBStore implements IVectorStore {
         this.db = await lancedb.connect(this.uri);
       }
 
-      const tableNames = await this.db.tableNames();
-      if (tableNames.includes(this.tableName)) {
+      // Try to use tableNames() if available
+      let tableExists = false;
+      try {
+        if (typeof (this.db as any).tableNames === 'function') {
+          const tableNames = await (this.db as any).tableNames();
+          tableExists = tableNames.includes(this.tableName);
+        }
+      } catch {
+        // tableNames() failed, will try dropTable directly
+      }
+
+      if (tableExists) {
         await this.db.dropTable(this.tableName);
         logger.info('Table dropped', { table: this.tableName });
+      } else {
+        // Try to drop table directly, ignore if it doesn't exist
+        try {
+          await this.db.dropTable(this.tableName);
+          logger.info('Table dropped', { table: this.tableName });
+        } catch {
+          // Table doesn't exist - that's fine
+        }
       }
 
       this.table = null;
@@ -186,10 +222,7 @@ export class LanceDBStore implements IVectorStore {
 
     try {
       if (!this.table) {
-        throw new MemSearchError(
-          'Table not initialized. Call ensureCollection() first.',
-          'LANCEDB_TABLE_NOT_INITIALIZED'
-        );
+        await this.ensureCollection();
       }
 
       // Convert VectorRecord to LanceDBRecord
@@ -213,15 +246,32 @@ export class LanceDBStore implements IVectorStore {
         access_count: r.access_count,
       }));
 
-      // Use mergeInsert for upsert behavior (update if exists, insert if not)
-      // LanceDB mergeInsert requires a key field - we use chunk_hash
-      await this.table
-        .mergeInsert('chunk_hash')
-        .whenMatchedUpdateAll()
-        .whenNotMatchedInsertAll()
-        .execute(lancedbRecords as unknown as Record<string, unknown>[]);
+      // Try mergeInsert first if available
+      try {
+        if (typeof (this.table as any).mergeInsert === 'function') {
+          await (this.table as any)
+            .mergeInsert('chunk_hash')
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute(lancedbRecords as unknown as Record<string, unknown>[]);
+          logger.info('Upsert completed (mergeInsert)', { count: records.length });
+          return records.length;
+        }
+      } catch {
+        // mergeInsert failed, fall back to manual upsert
+      }
 
-      logger.info('Upsert completed', { count: records.length });
+      // Manual upsert: delete existing records first, then insert new ones
+      const chunkHashes = records.map((r) => r.chunk_hash);
+      if (chunkHashes.length > 0) {
+        const deleteFilter = `chunk_hash IN (${chunkHashes.map((id) => `'${id}'`).join(', ')})`;
+        await this.table!.delete(deleteFilter);
+      }
+
+      // Insert new records
+      await this.table!.add(lancedbRecords as unknown as Record<string, unknown>[]);
+
+      logger.info('Upsert completed (manual)', { count: records.length });
       return records.length;
     } catch (error) {
       throw new MemSearchError(
@@ -289,16 +339,13 @@ export class LanceDBStore implements IVectorStore {
   async search(vector: number[], options?: SearchOptions): Promise<SearchResult[]> {
     try {
       if (!this.table) {
-        throw new MemSearchError(
-          'Table not initialized. Call ensureCollection() first.',
-          'LANCEDB_TABLE_NOT_INITIALIZED'
-        );
+        await this.ensureCollection();
       }
 
       const topK = options?.topK ?? 10;
 
       // Build vector search query
-      let query = this.table.vectorSearch(vector).limit(topK);
+      let query = this.table!.vectorSearch(vector).limit(topK);
 
       // Apply filter if provided
       if (options?.filter) {
@@ -335,14 +382,11 @@ export class LanceDBStore implements IVectorStore {
   ): Promise<ExtendedSearchResult[]> {
     try {
       if (!this.table) {
-        throw new MemSearchError(
-          'Table not initialized. Call ensureCollection() first.',
-          'LANCEDB_TABLE_NOT_INITIALIZED'
-        );
+        await this.ensureCollection();
       }
 
       // Build vector search query
-      let query = this.table.vectorSearch(vector).limit(topK);
+      let query = this.table!.vectorSearch(vector).limit(topK);
 
       // Apply filter if provided
       if (filter) {
@@ -386,13 +430,10 @@ export class LanceDBStore implements IVectorStore {
   async query(filter: string, limit = 1000): Promise<VectorRecord[]> {
     try {
       if (!this.table) {
-        throw new MemSearchError(
-          'Table not initialized. Call ensureCollection() first.',
-          'LANCEDB_TABLE_NOT_INITIALIZED'
-        );
+        await this.ensureCollection();
       }
 
-      const results = await this.table.query().where(convertFilter(filter)).limit(limit).toArray();
+      const results = await this.table!.query().where(convertFilter(filter)).limit(limit).toArray();
 
       // Map to VectorRecord format (convert null to undefined)
       return results.map((r: LanceDBRecord) => ({
@@ -429,6 +470,9 @@ export class LanceDBStore implements IVectorStore {
   async count(): Promise<number> {
     try {
       if (!this.table) {
+        await this.ensureCollection();
+      }
+      if (!this.table) {
         return 0;
       }
       return await this.table.countRows();
@@ -443,10 +487,10 @@ export class LanceDBStore implements IVectorStore {
   async getSources(): Promise<Set<string>> {
     try {
       if (!this.table) {
-        return new Set();
+        await this.ensureCollection();
       }
 
-      const results = await this.table.query().select(['source']).limit(10000).toArray();
+      const results = await this.table!.query().select(['source']).limit(10000).toArray();
 
       const sources = new Set<string>();
       for (const r of results) {
@@ -464,11 +508,10 @@ export class LanceDBStore implements IVectorStore {
   async getIdsBySource(source: string): Promise<Set<string>> {
     try {
       if (!this.table) {
-        return new Set();
+        await this.ensureCollection();
       }
 
-      const results = await this.table
-        .query()
+      const results = await this.table!.query()
         .where(`source = '${source}'`)
         .select(['chunk_hash'])
         .limit(10000)
