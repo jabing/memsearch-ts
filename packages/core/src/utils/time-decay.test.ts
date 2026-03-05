@@ -4,9 +4,12 @@ import { calculateTimeScore } from './time-decay.js';
 describe('time-decay', () => {
   describe('calculateTimeScore', () => {
     it('should return 1 for current time', () => {
-      const now = Date.now();
-      const score = calculateTimeScore(now, 1000);
-      expect(score).toBeCloseTo(1, 3);
+      const mockNow = 1000000;
+      vi.useFakeTimers();
+      vi.setSystemTime(mockNow);
+      const score = calculateTimeScore(mockNow, 1000);
+      expect(score).toBe(1);
+      vi.useRealTimers();
     });
 
     it('should return ~0.5 at exactly half-life', () => {
