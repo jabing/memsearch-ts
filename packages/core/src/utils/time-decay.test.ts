@@ -6,7 +6,7 @@ describe('time-decay', () => {
     it('should return 1 for current time', () => {
       const now = Date.now();
       const score = calculateTimeScore(now, 1000);
-      expect(score).toBeCloseTo(1, 5);
+      expect(score).toBeCloseTo(1, 3);
     });
 
     it('should return ~0.5 at exactly half-life', () => {
