@@ -1,5 +1,55 @@
 # Changelog
 
+## [1.4.1] - 2026-03-05
+
+### 🎉 Features
+
+#### Time Decay Search (#8)
+
+- **Added**: `timeDecayWeight` option to `MemorySearchOptions` (default: 0.3)
+- **Added**: `timeDecayHalfLife` option to `MemorySearchOptions` (default: 7 days)
+- **Added**: `timeScore` field to `MemorySearchResult` (0-1, 1 = very recent)
+- **Added**: `combinedScore` field to `MemorySearchResult` (weighted average of semantic + time)
+- **Changed**: Search results now sorted by `combinedScore` descending
+- **Priority**: Config options have sensible defaults for immediate usability
+
+### 🔧 Technical Improvements
+
+#### Time Decay Algorithm
+
+- **Formula**: Exponential decay `exp(-ln(2) * ageMs / halfLifeMs)`
+- **Score Normalization**: Semantic score converted from 0=best to 1=best for combination
+- **Combination**: `combinedScore = (1-w)*normalizedSemantic + w*timeScore`
+- **Edge Cases**: Properly handles future timestamps (clamped to current time)
+
+#### New Utility Module
+
+- **Added**: `src/utils/time-decay.ts` with `calculateTimeScore()` function
+- **Added**: 5 comprehensive unit tests for time decay calculations
+- **Exported**: Added to `src/utils/index.ts` for public use
+
+### 🐛 Bug Fixes
+
+#### Compatibility Tests Fixed
+
+- **Fixed**: LanceDB mock in `compat.test.ts` now has complete `vectorSearch()` and `query()` methods
+- **Fixed**: All 7 previously failing compatibility tests now pass
+- **Fixed**: All 290 tests now pass at 100%
+
+### 📦 Version Bump
+
+- memsearch-core: 1.4.0 → 1.4.1
+- memsearch-cli: 1.4.0 → 1.4.1
+
+### 🧪 Testing
+
+- **290 tests total - 100% pass rate** ✅
+- **5 new tests**: Time decay functionality
+- **16 compatibility tests**: All now passing
+- **No breaking changes**: Fully backward compatible with v1.4.0
+
+---
+
 ## [1.4.0] - 2026-03-04
 
 ### 🎉 Features
