@@ -86,6 +86,76 @@ vi.mock('@lancedb/lancedb', () => ({
             return Promise.resolve(results);
           }),
         })),
+        vectorSearch: vi.fn().mockImplementation((vector: any) => {
+          let currentLimit = 10;
+          let currentFilter: string | undefined;
+          const api = {
+            limit(n: number) {
+              currentLimit = n;
+              return api;
+            },
+            where(f: string) {
+              currentFilter = f;
+              return api;
+            },
+            toArray() {
+              let results = Array.from(mockRecords.values());
+              if (currentFilter) {
+                const m1 = currentFilter.match(/chunk_hash\s*={1,2}\s*"([^"]+)"/);
+                const m2 = currentFilter.match(/chunk_hash\s*={1,2}\s*'([^']+)'/);
+                let idToFind;
+                if (m1) idToFind = m1[1];
+                else if (m2) idToFind = m2[1];
+                if (idToFind) {
+                  const rec = mockRecords.get(idToFind);
+                  results = rec ? [rec] : [];
+                }
+              }
+              return Promise.resolve(
+                results.slice(0, currentLimit).map((r) => ({
+                  ...(r.entity || r),
+                  _distance: 0.85,
+                }))
+              );
+            },
+          };
+          return api;
+        }),
+        query: vi.fn().mockImplementation(() => {
+          let currentLimit = 1000;
+          let currentFilter: string | undefined;
+          const api = {
+            where(f: string) {
+              currentFilter = f;
+              return api;
+            },
+            limit(n: number) {
+              currentLimit = n;
+              return api;
+            },
+            select() {
+              return api;
+            },
+            toArray() {
+              let results = Array.from(mockRecords.values()).map((r) => ({
+                ...(r.entity || r),
+              }));
+              if (currentFilter) {
+                const m1 = currentFilter.match(/chunk_hash\s*={1,2}\s*"([^"]+)"/);
+                const m2 = currentFilter.match(/chunk_hash\s*={1,2}\s*'([^']+)'/);
+                let idToFind;
+                if (m1) idToFind = m1[1];
+                else if (m2) idToFind = m2[1];
+                if (idToFind) {
+                  const rec = mockRecords.get(idToFind);
+                  results = rec ? [{ ...(rec.entity || rec) }] : [];
+                }
+              }
+              return Promise.resolve(results.slice(0, currentLimit));
+            },
+          };
+          return api;
+        }),
         add: vi.fn().mockImplementation((records: any[]) => {
           records.forEach((r) => {
             mockRecords.set(r.chunk_hash, { ...r, score: 0.9 });
@@ -93,10 +163,10 @@ vi.mock('@lancedb/lancedb', () => ({
           return Promise.resolve({});
         }),
         delete: vi.fn().mockImplementation((filter: string) => {
-          const match = filter.match(/chunk_hash in \(([^)]+)\)/);
-          if (match) {
-            const ids = match[1].split(',').map((s: string) => s.trim().replace(/'/g, ''));
-            ids.forEach((id: string) => mockRecords.delete(id));
+          const m = filter.match(/chunk_hash in \(([^)]+)\)/i);
+          if (m) {
+            const ids = m[1].split(',').map((s) => s.trim().replace(/'/g, '').replace(/"/g, ''));
+            ids.forEach((id) => mockRecords.delete(id));
           }
           return Promise.resolve({});
         }),
@@ -127,6 +197,76 @@ vi.mock('@lancedb/lancedb', () => ({
           return Promise.resolve(results);
         }),
       })),
+      vectorSearch: vi.fn().mockImplementation((vector: any) => {
+        let currentLimit = 10;
+        let currentFilter: string | undefined;
+        const api = {
+          limit(n: number) {
+            currentLimit = n;
+            return api;
+          },
+          where(f: string) {
+            currentFilter = f;
+            return api;
+          },
+          toArray() {
+            let results = Array.from(mockRecords.values());
+            if (currentFilter) {
+              const m1 = currentFilter.match(/chunk_hash\s*={1,2}\s*"([^"]+)"/);
+              const m2 = currentFilter.match(/chunk_hash\s*={1,2}\s*'([^']+)'/);
+              let idToFind;
+              if (m1) idToFind = m1[1];
+              else if (m2) idToFind = m2[1];
+              if (idToFind) {
+                const rec = mockRecords.get(idToFind);
+                results = rec ? [rec] : [];
+              }
+            }
+            return Promise.resolve(
+              results.slice(0, currentLimit).map((r) => ({
+                ...(r.entity || r),
+                _distance: 0.85,
+              }))
+            );
+          },
+        };
+        return api;
+      }),
+      query: vi.fn().mockImplementation(() => {
+        let currentLimit = 1000;
+        let currentFilter: string | undefined;
+        const api = {
+          where(f: string) {
+            currentFilter = f;
+            return api;
+          },
+          limit(n: number) {
+            currentLimit = n;
+            return api;
+          },
+          select() {
+            return api;
+          },
+          toArray() {
+            let results = Array.from(mockRecords.values()).map((r) => ({
+              ...(r.entity || r),
+            }));
+            if (currentFilter) {
+              const m1 = currentFilter.match(/chunk_hash\s*={1,2}\s*"([^"]+)"/);
+              const m2 = currentFilter.match(/chunk_hash\s*={1,2}\s*'([^']+)'/);
+              let idToFind;
+              if (m1) idToFind = m1[1];
+              else if (m2) idToFind = m2[1];
+              if (idToFind) {
+                const rec = mockRecords.get(idToFind);
+                results = rec ? [{ ...(rec.entity || rec) }] : [];
+              }
+            }
+            return Promise.resolve(results.slice(0, currentLimit));
+          },
+        };
+        return api;
+      }),
       add: vi.fn().mockImplementation((records: any[]) => {
         records.forEach((r) => {
           mockRecords.set(r.chunk_hash, { ...r, score: 0.9 });
@@ -134,10 +274,10 @@ vi.mock('@lancedb/lancedb', () => ({
         return Promise.resolve({});
       }),
       delete: vi.fn().mockImplementation((filter: string) => {
-        const match = filter.match(/chunk_hash in \(([^)]+)\)/);
-        if (match) {
-          const ids = match[1].split(',').map((s: string) => s.trim().replace(/"/g, ''));
-          ids.forEach((id: string) => mockRecords.delete(id));
+        const m = filter.match(/chunk_hash in \(([^)]+)\)/i);
+        if (m) {
+          const ids = m[1].split(',').map((s) => s.trim().replace(/'/g, '').replace(/"/g, ''));
+          ids.forEach((id) => mockRecords.delete(id));
         }
         return Promise.resolve({});
       }),
