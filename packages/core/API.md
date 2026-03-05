@@ -191,6 +191,8 @@ interface MemorySearchOptions {
   memoryType?: MemoryType;
   nodeType?: string;
   minImportance?: number;
+  timeDecayWeight?: number; // Default: 0.3 (0-1)
+  timeDecayHalfLife?: number; // Default: 604800000 (7 days in ms)
 }
 ```
 
@@ -199,7 +201,9 @@ interface MemorySearchOptions {
 ```typescript
 interface MemorySearchResult {
   memory: Memory;
-  score: number;
+  score: number; // Semantic similarity (0-1, lower = better)
+  timeScore: number; // Time decay score (0-1, higher = more recent)
+  combinedScore: number; // Combined score (0-1, higher = better)
 }
 ```
 
@@ -323,6 +327,19 @@ const embedder = new VoyageEmbedding({
 
 ## Utilities
 
+### calculateTimeScore
+
+```typescript
+import { calculateTimeScore } from 'memsearch-core';
+
+// Calculate time decay score for a memory
+const timeScore = calculateTimeScore(
+  createdAt: number,      // Timestamp (ms since epoch)
+  halfLifeMs: number       // Half-life in ms (default: 7 days)
+);
+// Returns: 0-1 (1 = very recent, 0 = very old)
+```
+
 ### chunkMarkdown
 
 ```typescript
@@ -399,6 +416,18 @@ const results = await mem.searchMemory('database caching', { topK: 5 });
 // Filter by type
 const concepts = await mem.searchMemory('redis', { memoryType: 'semantic' });
 const experiences = await mem.searchMemory('outage', { memoryType: 'episodic' });
+
+// Time decay search (default: 0.3 weight, 7-day half-life)
+const recentResults = await mem.searchMemory('recent work', {
+  topK: 10,
+  timeDecayWeight: 0.5, // Equal weight to semantics and recency
+  timeDecayHalfLife: 259200000, // 3 days in ms
+});
+
+// Results have timeScore and combinedScore
+console.log(recentResults[0].score); // Semantic similarity
+console.log(recentResults[0].timeScore); // Time decay score
+console.log(recentResults[0].combinedScore); // Weighted combination
 
 // Get statistics
 const stats = await mem.getStats();

@@ -30,6 +30,15 @@ await mem.index();
 const results = await mem.search('Redis caching', { topK: 5 });
 console.log(results[0].content, results[0].score);
 
+// Memory search with time decay
+const recentMemories = await mem.searchMemory('recent work', {
+  topK: 10,
+  timeDecayWeight: 0.5, // 50% semantics, 50% recency
+  timeDecayHalfLife: 259200000, // 3 days
+});
+console.log(recentMemories[0].timeScore); // 0-1 (1 = very recent)
+console.log(recentMemories[0].combinedScore); // Weighted combination
+
 // Cleanup
 mem.close();
 ```
@@ -40,6 +49,7 @@ mem.close();
 - ⚡ **Smart dedup** — SHA-256 content hashing prevents duplicates
 - 🔄 **Live sync** — File watcher auto-indexes changes
 - 🔍 **Hybrid search** — Dense vector + BM25 + RRF reranking (Milvus backend only)
+- ⏰ **Time decay search** — Recent memories are more relevant (configurable)
 - 🎯 **Type-safe** — Full TypeScript support
 - 🗄️ **Flexible backends** — Embedded LanceDB (default) or Milvus
 
